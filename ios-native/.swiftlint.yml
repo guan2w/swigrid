@@ -1,0 +1,28 @@
+included:
+  - Sources
+  - Tests
+
+excluded:
+  - .build
+
+opt_in_rules:
+  - empty_count
+  - empty_string
+  - closure_spacing
+  - redundant_nil_coalescing
+
+disabled_rules:
+  - todo
+
+line_length:
+  warning: 140
+  error: 180
+
+identifier_name:
+  min_length: 1
+  excluded:
+    - id
+    - x
+    - y
+
+reporter: "xcode"

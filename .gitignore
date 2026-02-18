@@ -1,0 +1,37 @@
+# macOS
+.DS_Store
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Local environment
+.env
+.env.*
+.gem/
+
+# SwiftPM / Xcode build artifacts
+.build/
+.build-*/
+**/.build/
+**/.build-*/
+.swiftpm/
+**/.swiftpm/
+DerivedData/
+**/DerivedData/
+SourcePackages/
+**/SourcePackages/
+Packages/
+**/Packages/
+
+# Xcode user state
+**/xcuserdata/
+**/*.xcuserstate
+
+# Test/build outputs
+*.xcresult
+
+# Local-only legacy source link
+legacy-flutter-code
