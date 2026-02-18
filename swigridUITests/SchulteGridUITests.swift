@@ -1,6 +1,6 @@
 import XCTest
 
-final class swigridUITests: XCTestCase {
+final class SchulteGridUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
     }

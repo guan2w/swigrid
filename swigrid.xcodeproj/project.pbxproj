@@ -12,6 +12,7 @@
 
 /* Begin PBXFileReference section */
 		07D0FF932F45B38D00D2ED01 /* swigrid.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = swigrid.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1B2C3E12F48000100D2ED01 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Package.swift; path = Package.swift; sourceTree = SOURCE_ROOT; };
 		B20C00012F47000100D2ED01 /* swigridUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = swigridUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -20,6 +21,16 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = swigrid;
 			sourceTree = "<group>";
+		};
+		A1B2C3E22F48000100D2ED01 /* Sources */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Sources;
+			sourceTree = SOURCE_ROOT;
+		};
+		A1B2C3E32F48000100D2ED01 /* Tests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Tests;
+			sourceTree = SOURCE_ROOT;
 		};
 		B20C00022F47000100D2ED01 /* swigridUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
@@ -52,6 +63,9 @@
 			children = (
 				07D0FF952F45B38D00D2ED01 /* swigrid */,
 				B20C00022F47000100D2ED01 /* swigridUITests */,
+				A1B2C3E22F48000100D2ED01 /* Sources */,
+				A1B2C3E32F48000100D2ED01 /* Tests */,
+				A1B2C3E12F48000100D2ED01 /* Package.swift */,
 				07D0FF942F45B38D00D2ED01 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -153,7 +167,7 @@
 			mainGroup = 07D0FF8A2F45B38D00D2ED01;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				A1B2C3D22F46000100D2ED01 /* XCLocalSwiftPackageReference ".." */,
+				A1B2C3D22F46000100D2ED01 /* XCLocalSwiftPackageReference "." */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 07D0FF942F45B38D00D2ED01 /* Products */;
@@ -209,16 +223,16 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		A1B2C3D22F46000100D2ED01 /* XCLocalSwiftPackageReference ".." */ = {
+		A1B2C3D22F46000100D2ED01 /* XCLocalSwiftPackageReference "." */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = ..;
+			relativePath = .;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		A1B2C3D32F46000100D2ED01 /* SchulteAppUI */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A1B2C3D22F46000100D2ED01 /* XCLocalSwiftPackageReference ".." */;
+			package = A1B2C3D22F46000100D2ED01 /* XCLocalSwiftPackageReference "." */;
 			productName = SchulteAppUI;
 		};
 /* End XCSwiftPackageProductDependency section */

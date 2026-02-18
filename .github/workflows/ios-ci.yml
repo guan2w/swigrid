@@ -1,0 +1,30 @@
+name: ios-ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Build SchulteApp
+        run: swift build --product SchulteApp
+
+      - name: Run tests
+        run: swift test
+
+      - name: Build with Xcode backend
+        run: ./scripts/verify-xcode-backend.sh
+
+      - name: Build iOS app shell
+        run: ./scripts/verify-ios-app.sh
+
+      - name: Run iOS UI smoke tests
+        run: ./scripts/verify-ios-ui-tests.sh

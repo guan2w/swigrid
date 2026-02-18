@@ -1,6 +1,6 @@
-# SchulteGridNative (WIP)
+# Schulte Grid iOS (WIP)
 
-Current implementation includes core business logic, persistence, and a runnable SwiftUI app prototype.
+Current implementation includes core business logic, persistence, and a runnable SwiftUI app.
 
 ## Modules
 
@@ -9,6 +9,14 @@ Current implementation includes core business logic, persistence, and a runnable
 - `SchulteFeatures`: UI-facing view models for Home/Game/Records
 - `SchulteAppUI`: Home -> Game -> Result -> Home / Records navigation and iOS-style screens
 - `SchulteApp`: executable wrapper for SwiftPM local run, reusing `SchulteAppUI`
+
+## Project layout
+
+- `swigrid.xcodeproj`: iOS app shell project (open this in Xcode)
+- `swigrid/`: app entry and app-level resources
+- `swigridUITests/`: iPhone/iPad UI smoke tests
+- `Package.swift`: local Swift Package manifest
+- `Sources/` + `Tests/`: core business modules and unit/integration tests
 
 ## Current scope
 
@@ -24,7 +32,6 @@ Current implementation includes core business logic, persistence, and a runnable
 ## Local verification
 
 ```bash
-cd ios-native
 mkdir -p .build/{home,modulecache,cache,config,security}
 HOME=$(pwd)/.build/home \
 SWIFTPM_MODULECACHE_OVERRIDE=$(pwd)/.build/modulecache \
@@ -40,28 +47,24 @@ swift test \
 or simply:
 
 ```bash
-cd ios-native
 ./scripts/verify.sh
 ```
 
 Verify SwiftPM with Xcode backend:
 
 ```bash
-cd ios-native
 ./scripts/verify-xcode-backend.sh
 ```
 
-Verify Xcode iOS app shell (`ios-app/swigrid.xcodeproj`):
+Verify Xcode iOS app shell (`swigrid.xcodeproj`):
 
 ```bash
-cd ios-native
 ./scripts/verify-ios-app.sh
 ```
 
 Run iPhone/iPad UI smoke tests (XCUITest):
 
 ```bash
-cd ios-native
 ./scripts/verify-ios-ui-tests.sh
 ```
 
@@ -75,7 +78,6 @@ Note: with portrait-only orientation on iOS 26, `xcodebuild` may print an interf
 ## Build app prototype
 
 ```bash
-cd ios-native
 HOME=$(pwd)/.build/home \
 SWIFTPM_MODULECACHE_OVERRIDE=$(pwd)/.build/modulecache \
 CLANG_MODULE_CACHE_PATH=$(pwd)/.build/modulecache \
@@ -91,7 +93,6 @@ swift build \
 ## Verify iOS simulator compile
 
 ```bash
-cd ios-native
 ./scripts/verify-ios-sim.sh
 ```
 
@@ -99,5 +100,5 @@ Note: SwiftPM executable linking for iOS simulator may print a sysroot warning i
 
 ## CI
 
-- Workflow: `.github/workflows/ios-native-ci.yml`
-- Lint/format config: `ios-native/.swiftlint.yml`, `ios-native/.swiftformat`
+- Workflow: `.github/workflows/ios-ci.yml`
+- Lint/format config: `.swiftlint.yml`, `.swiftformat`

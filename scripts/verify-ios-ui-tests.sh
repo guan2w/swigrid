@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-PROJECT="$ROOT_DIR/ios-app/swigrid.xcodeproj"
+PROJECT="$ROOT_DIR/swigrid.xcodeproj"
 SCHEME="swigrid"
 
 mkdir -p "$ROOT_DIR/.build-ui"/{home,modulecache}
@@ -57,6 +57,6 @@ run_ui_test() {
 IPHONE_DESTINATION="$(pick_destination iPhone "iPhone 17" "iPhone 17 Pro" "iPhone 16e" "iPhone Air")"
 IPAD_DESTINATION="$(pick_destination iPad "iPad (A16)" "iPad Pro 11-inch (M4)" "iPad Air 11-inch (M3)" "iPad mini (A17 Pro)")"
 
-run_ui_test "$IPHONE_DESTINATION" ".build-ios-ui-test" "swigridUITests/testCoreFlowSavesRecord"
-run_ui_test "$IPHONE_DESTINATION" ".build-ios-ui-test" "swigridUITests/testMutePersistsAfterRelaunch"
-run_ui_test "$IPAD_DESTINATION" ".build-ios-ui-test-ipad" "swigridUITests/testCoreFlowSavesRecord"
+run_ui_test "$IPHONE_DESTINATION" ".build-ios-ui-test" "swigridUITests/SchulteGridUITests/testCoreFlowSavesRecord"
+run_ui_test "$IPHONE_DESTINATION" ".build-ios-ui-test" "swigridUITests/SchulteGridUITests/testMutePersistsAfterRelaunch"
+run_ui_test "$IPAD_DESTINATION" ".build-ios-ui-test-ipad" "swigridUITests/SchulteGridUITests/testCoreFlowSavesRecord"

@@ -11,6 +11,7 @@
 .env
 .env.*
 .gem/
+.netrc
 
 # SwiftPM / Xcode build artifacts
 .build/

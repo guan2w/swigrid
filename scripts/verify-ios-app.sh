@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-PROJECT="$ROOT_DIR/ios-app/swigrid.xcodeproj"
+PROJECT="$ROOT_DIR/swigrid.xcodeproj"
 SCHEME="swigrid"
 
 mkdir -p "$ROOT_DIR/.build-ios-app-env"/{home,modulecache}
