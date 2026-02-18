@@ -40,9 +40,10 @@ public final class HomeViewModel: ObservableObject {
     }
 
     public func savePlayerName(_ name: String) async {
-        state.playerName = name
+        let normalizedName = Player.normalizedName(name)
+        state.playerName = normalizedName
         do {
-            try await playerRepository.savePlayer(Player(name: name))
+            try await playerRepository.savePlayer(Player(name: normalizedName))
         } catch {
             return
         }

@@ -38,4 +38,22 @@ final class ScoreRecordsTests: XCTestCase {
         XCTAssertEqual(records.latestLevel5Record(config)?.p1.name, "B")
         XCTAssertEqual(records.best(config)?.p1.name, "B")
     }
+
+    func testNormalizedSortsAndKeepsLatestLevel5FromLegacyPayload() throws {
+        let config = GridConfig(scale: 3, dual: false)
+        let key = config.asKey()
+
+        let slow = try ScoreRecord(p1: Player(name: "Slow"), gc: config, t0: 1_000, t1: 6_000)
+        let fast = try ScoreRecord(p1: Player(name: "Fast"), gc: config, t0: 1_000, t1: 3_000)
+        let latestFive = try ScoreRecord(p1: Player(name: "Latest5"), gc: config, t0: 9_000, t1: 10_500)
+
+        let legacy = ScoreRecords(
+            records: [key: [slow, fast]],
+            latestLevel5Records: [key: latestFive]
+        )
+
+        let normalized = legacy.normalized()
+        XCTAssertEqual(normalized.records[key]?.map(\.p1.name), ["Fast", "Slow"])
+        XCTAssertEqual(normalized.latestLevel5Records[key]?.p1.name, "Latest5")
+    }
 }

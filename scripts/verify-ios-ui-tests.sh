@@ -51,6 +51,8 @@ run_ui_test() {
     -destination "$destination" \
     -derivedDataPath "$ROOT_DIR/$derived_data_path" \
     -only-testing:"$test_case" \
+    -parallel-testing-enabled NO \
+    -maximum-parallel-testing-workers 1 \
     CODE_SIGNING_ALLOWED=NO
 }
 

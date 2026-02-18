@@ -17,13 +17,13 @@ public actor LocalScoreRecordRepository: ScoreRecordRepository {
             return ScoreRecords()
         }
 
-        return (try? decoder.decode(ScoreRecords.self, from: data)) ?? ScoreRecords()
+        return ((try? decoder.decode(ScoreRecords.self, from: data)) ?? ScoreRecords()).normalized()
     }
 
     public func save(_ record: ScoreRecord) async throws {
         var all = try await loadAll()
         all.saveRecord(record)
-        let data = try encoder.encode(all)
+        let data = try encoder.encode(all.normalized())
         try await store.setData(data, forKey: key)
     }
 }

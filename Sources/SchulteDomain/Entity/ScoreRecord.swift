@@ -39,6 +39,6 @@ public struct ScoreRecord: Codable, Equatable, Sendable {
     }
 
     public func isFresh(referenceTimestampMS: Int64 = Int64(Date().timeIntervalSince1970 * 1000)) -> Bool {
-        referenceTimestampMS > t1 && (referenceTimestampMS - t1) < 86_400_000
+        referenceTimestampMS >= t1 && (referenceTimestampMS - t1) < 86_400_000
     }
 }

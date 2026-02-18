@@ -77,8 +77,8 @@ struct HomeScreen: View {
 
             TextField("Input your name", text: $playerNameInput)
                 .onChange(of: playerNameInput) { _, newValue in
-                    if newValue.count > 16 {
-                        playerNameInput = String(newValue.prefix(16))
+                    if newValue.count > Player.maxNameLength {
+                        playerNameInput = String(newValue.prefix(Player.maxNameLength))
                     }
                 }
                 .padding(.horizontal, 12)

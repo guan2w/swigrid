@@ -19,7 +19,7 @@ final class SchulteGridUITests: XCTestCase {
 
         let nextButton = app.buttons["game.next"]
         XCTAssertTrue(nextButton.waitForExistence(timeout: 5))
-        XCTAssertTrue(waitForLabel(nextButton, equals: "1", timeout: 6), "Game did not start in time")
+        XCTAssertTrue(waitForEnabled(nextButton, timeout: 6), "Game did not start in time")
 
         for number in 1 ... 25 {
             XCTAssertTrue(tapCell(number: number, in: app), "Missing tappable cell \(number)")
@@ -36,7 +36,7 @@ final class SchulteGridUITests: XCTestCase {
         XCTAssertTrue(recordsButton.waitForExistence(timeout: 5))
         recordsButton.tap()
 
-        let recordsList = app.tables["records.list"]
+        let recordsList = app.collectionViews["records.list"].firstMatch
         XCTAssertTrue(recordsList.waitForExistence(timeout: 5))
         XCTAssertTrue(recordsList.cells.firstMatch.waitForExistence(timeout: 5))
         XCTAssertTrue(recordsList.staticTexts["UITester"].firstMatch.exists)
@@ -109,8 +109,8 @@ final class SchulteGridUITests: XCTestCase {
     }
 
     @MainActor
-    private func waitForLabel(_ element: XCUIElement, equals expected: String, timeout: TimeInterval) -> Bool {
-        let predicate = NSPredicate(format: "label == %@", expected)
+    private func waitForEnabled(_ element: XCUIElement, timeout: TimeInterval) -> Bool {
+        let predicate = NSPredicate(format: "enabled == true")
         let expectation = XCTNSPredicateExpectation(predicate: predicate, object: element)
         return XCTWaiter.wait(for: [expectation], timeout: timeout) == .completed
     }

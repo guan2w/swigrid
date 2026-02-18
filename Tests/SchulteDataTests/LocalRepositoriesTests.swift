@@ -62,4 +62,25 @@ final class LocalRepositoriesTests: XCTestCase {
         let reloaded = try await loadUseCase.execute()
         XCTAssertTrue(reloaded.mute)
     }
+
+    func testScoreRecordRepositoryNormalizesLegacyPayloadOnLoad() async throws {
+        let store = InMemoryKeyValueStore()
+        let repository = LocalScoreRecordRepository(store: store)
+        let config = GridConfig(scale: 3, dual: false)
+
+        let slow = try ScoreRecord(p1: Player(name: "Slow"), gc: config, t0: 1_000, t1: 6_000)
+        let fast = try ScoreRecord(p1: Player(name: "Fast"), gc: config, t0: 1_000, t1: 3_000)
+        let latestFive = try ScoreRecord(p1: Player(name: "Latest5"), gc: config, t0: 9_000, t1: 10_500)
+
+        let payload = ScoreRecords(
+            records: [config.asKey(): [slow, fast]],
+            latestLevel5Records: [config.asKey(): latestFive]
+        )
+        let encoded = try JSONEncoder().encode(payload)
+        try await store.setData(encoded, forKey: StorageKeys.localRecords)
+
+        let loaded = try await repository.loadAll()
+        XCTAssertEqual(loaded.records[config.asKey()]?.map(\.p1.name), ["Fast", "Slow"])
+        XCTAssertEqual(loaded.latestLevel5Record(config)?.p1.name, "Latest5")
+    }
 }
