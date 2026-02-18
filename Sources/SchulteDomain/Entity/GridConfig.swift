@@ -26,7 +26,12 @@ public struct GridConfig: Codable, Equatable, Hashable, Sendable {
         squaredScale * (dual ? 2 : 1)
     }
 
-    public func asKey() -> String {
+    public func storageKey() -> String {
         "\(scale):\(dual ? 2 : 1)"
+    }
+
+    @available(*, deprecated, renamed: "storageKey()")
+    public func asKey() -> String {
+        storageKey()
     }
 }

@@ -12,15 +12,15 @@ struct GameScreen: View {
     private let scoreRecordRepository: any ScoreRecordRepository
 
     @State private var player = Player()
-    @State private var currentConfig = GridConfig()
-    @State private var muted = false
-    @State private var cellNumbers: [Int?] = []
-    @State private var secondRoundNumbers: [Int]? = nil
-    @State private var didPersistResult = false
+    @State private var activeGridConfig = GridConfig()
+    @State private var isMuted = false
+    @State private var displayedNumbers: [Int?] = []
+    @State private var deferredSecondRoundNumbers: [Int]? = nil
+    @State private var didSaveResult = false
 
-    @State private var showResult = false
+    @State private var showsResultAlert = false
     @State private var resultSeconds = "0.00"
-    @State private var resultStars = 0
+    @State private var resultLevel = 0
     @State private var errorMessage: String? = nil
 
     @State private var audioService = AudioService()
@@ -42,7 +42,7 @@ struct GameScreen: View {
             VStack(spacing: 14) {
                 HStack {
                     VStack(alignment: .leading) {
-                        Text("Next")
+                        Text("Next Number")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                         Button {
@@ -61,18 +61,18 @@ struct GameScreen: View {
                     Spacer()
 
                     VStack(alignment: .trailing) {
-                        Text("Time")
+                        Text("Elapsed")
                             .font(.caption)
                             .foregroundStyle(.secondary)
-                        Text(formatSeconds(viewModel.state.elapsedMS))
+                        Text(formatSeconds(viewModel.state.elapsedMilliseconds))
                             .font(.custom("digital-7", size: 44))
                             .foregroundStyle(.yellow.opacity(0.9))
                             .accessibilityIdentifier("game.timer")
                     }
                 }
 
-                if !player.isNotEmpty {
-                    Text("Please set player name in Home first")
+                if !player.hasName {
+                    Text("Set a player name on Home before starting.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
@@ -81,18 +81,18 @@ struct GameScreen: View {
                     gridView(side: gridSide)
                         .overlay(alignment: .center) {
                             if viewModel.state.status == .ready {
-                                Text(viewModel.state.countdown > 0 ? "\(viewModel.state.countdown)" : "Start")
+                                Text(viewModel.state.countdown > 0 ? "\(viewModel.state.countdown)" : "Go")
                                     .font(.custom("CrashNumbering", size: min(gridSide * 0.34, 110)))
                                     .foregroundStyle(.green.opacity(0.75))
                             }
                         }
                 }
 
-                Button("Restart") {
+                Button("Restart Round") {
                     Task { await configureGame() }
                 }
                 .buttonStyle(.borderedProminent)
-                .disabled(!player.isNotEmpty)
+                .disabled(!player.hasName)
                 .accessibilityIdentifier("game.restart")
 
                 Spacer(minLength: 0)
@@ -100,12 +100,12 @@ struct GameScreen: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .padding(16)
         }
-        .navigationTitle("Game")
+        .navigationTitle("Challenge")
         .task {
             await configureGame()
         }
         .onReceive(countdownTimer) { _ in
-            if player.isNotEmpty, viewModel.state.status == .ready, viewModel.state.countdown > 0 {
+            if player.hasName, viewModel.state.status == .ready, viewModel.state.countdown > 0 {
                 viewModel.tickCountdown()
             }
         }
@@ -118,17 +118,17 @@ struct GameScreen: View {
             }
 
             Task {
-                await persistResultIfNeeded()
+                await saveResultIfNeeded()
             }
         }
-        .alert("Result", isPresented: $showResult) {
+        .alert("Round Complete", isPresented: $showsResultAlert) {
             Button("OK", role: .cancel) {
                 dismiss()
             }
         } message: {
-            Text("Time: \(resultSeconds)\nStars: \(resultStars)/5")
+            Text("Time: \(resultSeconds)\nRating: \(resultLevel)/5")
         }
-        .alert("Game Error", isPresented: Binding(
+        .alert("Unable to Continue", isPresented: Binding(
             get: { errorMessage != nil },
             set: { if !$0 { errorMessage = nil } }
         )) {
@@ -140,14 +140,14 @@ struct GameScreen: View {
 
     private func gridView(side: CGFloat) -> some View {
         let spacing: CGFloat = 6
-        let scale = max(currentConfig.scale, 1)
+        let scale = max(activeGridConfig.scale, 1)
         let columns = Array(repeating: GridItem(.flexible(), spacing: spacing), count: scale)
         let cellSize = max((side - CGFloat(scale - 1) * spacing) / CGFloat(scale), 44)
         let fontSize = min(cellSize * 0.48, 30)
 
         return LazyVGrid(columns: columns, spacing: 6) {
-            ForEach(cellNumbers.indices, id: \.self) { index in
-                let displayNumber = cellNumbers[index]
+            ForEach(displayedNumbers.indices, id: \.self) { index in
+                let displayNumber = displayedNumbers[index]
                 let isHighlighted = (viewModel.state.highlightedNumber == displayNumber)
 
                 Button {
@@ -183,35 +183,35 @@ struct GameScreen: View {
             let loadedPlayer = try await playerRepository.loadPlayer()
             let loadedConfig = try await gameConfigRepository.loadConfig()
             player = loadedPlayer
-            currentConfig = loadedConfig.gridConfig
-            muted = loadedConfig.mute
+            activeGridConfig = loadedConfig.gridConfig
+            isMuted = loadedConfig.mute
 
-            guard player.isNotEmpty else {
+            guard player.hasName else {
                 viewModel.reset()
-                cellNumbers = []
-                secondRoundNumbers = nil
-                didPersistResult = true
+                displayedNumbers = []
+                deferredSecondRoundNumbers = nil
+                didSaveResult = true
                 return
             }
 
-            try viewModel.configure(gridConfig: currentConfig)
+            try viewModel.configure(gridConfig: activeGridConfig)
             if let gridNumbers = viewModel.state.gridNumbers {
-                cellNumbers = gridNumbers.firstRound.map { Optional($0) }
-                secondRoundNumbers = gridNumbers.secondRound
+                displayedNumbers = gridNumbers.firstRound.map { Optional($0) }
+                deferredSecondRoundNumbers = gridNumbers.secondRound
             } else {
-                cellNumbers = []
-                secondRoundNumbers = nil
+                displayedNumbers = []
+                deferredSecondRoundNumbers = nil
             }
 
-            didPersistResult = false
-            showResult = false
+            didSaveResult = false
+            showsResultAlert = false
         } catch {
-            errorMessage = "Failed to configure game: \(error.localizedDescription)"
+            errorMessage = "Failed to load game setup: \(error.localizedDescription)"
         }
     }
 
     private func handleCellTap(index: Int) {
-        guard let number = cellNumbers[index] else {
+        guard let number = displayedNumbers[index] else {
             return
         }
 
@@ -221,42 +221,42 @@ struct GameScreen: View {
         case .ignored:
             break
         case .incorrect:
-            audioService.play(.incorrect, muted: muted)
+            audioService.play(.incorrect, muted: isMuted)
             hapticService.incorrectTap()
         case .correct, .finished:
-            audioService.play(.correct, muted: muted)
+            audioService.play(.correct, muted: isMuted)
             hapticService.correctTap()
-            if let secondRoundNumbers {
-                if cellNumbers[index] == secondRoundNumbers[index] {
-                    cellNumbers[index] = nil
+            if let deferredSecondRoundNumbers {
+                if displayedNumbers[index] == deferredSecondRoundNumbers[index] {
+                    displayedNumbers[index] = nil
                 } else {
-                    cellNumbers[index] = secondRoundNumbers[index]
+                    displayedNumbers[index] = deferredSecondRoundNumbers[index]
                 }
             } else {
-                cellNumbers[index] = nil
+                displayedNumbers[index] = nil
             }
         }
     }
 
-    private func persistResultIfNeeded() async {
-        guard !didPersistResult else {
+    private func saveResultIfNeeded() async {
+        guard !didSaveResult else {
             return
         }
 
-        didPersistResult = true
+        didSaveResult = true
 
         do {
             let record = try viewModel.finalizeRecord(player: player)
             try await scoreRecordRepository.save(record)
             resultSeconds = String(format: "%.2f", record.timeScoreAsSeconds)
-            resultStars = record.level
-            showResult = true
+            resultLevel = record.level
+            showsResultAlert = true
         } catch {
-            errorMessage = "Failed to finish game: \(error.localizedDescription)"
+            errorMessage = "Failed to save the result: \(error.localizedDescription)"
         }
     }
 
     private func formatSeconds(_ milliseconds: Int64) -> String {
-        String(format: "%.2f", ScoringRule.scoreMS2S(milliseconds))
+        String(format: "%.2f", ScoringRule.millisecondsToSeconds(milliseconds))
     }
 }

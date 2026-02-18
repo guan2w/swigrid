@@ -28,8 +28,13 @@ public struct Player: Codable, Equatable, Sendable {
         try container.encode(name, forKey: .name)
     }
 
-    public var isNotEmpty: Bool {
+    public var hasName: Bool {
         !name.isEmpty
+    }
+
+    @available(*, deprecated, renamed: "hasName")
+    public var isNotEmpty: Bool {
+        hasName
     }
 
     public static func normalizedName(_ value: String) -> String {

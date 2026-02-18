@@ -27,8 +27,8 @@ final class GameViewModelTests: XCTestCase {
 
         XCTAssertEqual(viewModel.state.status, .finished)
         let record = try viewModel.finalizeRecord(player: Player(name: "P1"))
-        XCTAssertEqual(record.p1.name, "P1")
-        XCTAssertEqual(record.gc, config)
+        XCTAssertEqual(record.player.name, "P1")
+        XCTAssertEqual(record.gridConfig, config)
     }
 
     func testResetClearsSessionState() throws {

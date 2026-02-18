@@ -102,6 +102,6 @@ public struct GameSession: Equatable, Sendable {
             throw SessionError.missingTimeScore
         }
 
-        return try ScoreRecord(p1: player, gc: gridConfig, t0: start, t1: end)
+        return try ScoreRecord(player: player, gridConfig: gridConfig, startTimestampMS: start, endTimestampMS: end)
     }
 }

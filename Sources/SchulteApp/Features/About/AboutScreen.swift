@@ -8,10 +8,10 @@ struct AboutScreen: View {
             Text("Schulte Grid")
                 .font(.system(size: 36, weight: .bold, design: .serif))
 
-            Text("A focus and visual training game with native iOS rewrite.")
+            Text("A focus and visual scanning game, rebuilt with native iOS interactions.")
                 .foregroundStyle(.secondary)
 
-            Picker("Docs", selection: $tab) {
+            Picker("Content", selection: $tab) {
                 Text("Help").tag(0)
                 Text("Changelog").tag(1)
             }
@@ -35,11 +35,11 @@ struct AboutScreen: View {
     }
 
     private var helpMarkdown: String {
-        loadMarkdown(named: "help.md") ?? "No help content"
+        loadMarkdown(named: "help.md") ?? "Help content is unavailable."
     }
 
     private var changelogMarkdown: String {
-        loadMarkdown(named: "changelog.md") ?? "No changelog content"
+        loadMarkdown(named: "changelog.md") ?? "No changelog entries."
     }
 
     private func loadMarkdown(named filename: String) -> String? {

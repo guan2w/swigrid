@@ -1,6 +1,6 @@
-> Tap from 1 to the max number, see how fast you can be!
+> Tap numbers from 1 to the highest value as quickly as you can.
 
 
 ### The grid switcher (`3 × 3`)
-- Sweep to change the grid scale.
-- Tap to toggle extra round.
+- Swipe to change the grid size.
+- Toggle `Dual Mode` to play a second round in one run.

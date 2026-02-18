@@ -11,10 +11,10 @@ final class HomeViewModelTests: XCTestCase {
 
         var scoreRecords = ScoreRecords()
         let fiveStar = try ScoreRecord(
-            p1: Player(name: "WG"),
-            gc: gridConfig,
-            t0: 1_000,
-            t1: 3_000
+            player: Player(name: "WG"),
+            gridConfig: gridConfig,
+            startTimestampMS: 1_000,
+            endTimestampMS: 3_000
         )
         scoreRecords.saveRecord(fiveStar)
         let scoreRepository = MockScoreRecordRepository(scoreRecords: scoreRecords)

@@ -9,8 +9,8 @@ struct HomeScreen: View {
     private let onRecords: () -> Void
     private let onAbout: () -> Void
 
-    @State private var playerNameInput = ""
-    @State private var showRequirePlayerAlert = false
+    @State private var playerNameDraft = ""
+    @State private var showsPlayerNameRequiredAlert = false
 
     init(
         dependency: AppDependency,
@@ -61,24 +61,24 @@ struct HomeScreen: View {
         }
         .task {
             await viewModel.load()
-            playerNameInput = viewModel.state.playerName
+            playerNameDraft = viewModel.state.playerName
         }
-        .alert("Player name required", isPresented: $showRequirePlayerAlert) {
+        .alert("Player Name Required", isPresented: $showsPlayerNameRequiredAlert) {
             Button("OK", role: .cancel) {}
         } message: {
-            Text("Please input a player name before starting the game.")
+            Text("Please enter a player name before starting.")
         }
     }
 
     private var playerSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Player")
+            Text("Player Name")
                 .font(.headline)
 
-            TextField("Input your name", text: $playerNameInput)
-                .onChange(of: playerNameInput) { _, newValue in
+            TextField("Enter your name", text: $playerNameDraft)
+                .onChange(of: playerNameDraft) { _, newValue in
                     if newValue.count > Player.maxNameLength {
-                        playerNameInput = String(newValue.prefix(Player.maxNameLength))
+                        playerNameDraft = String(newValue.prefix(Player.maxNameLength))
                     }
                 }
                 .padding(.horizontal, 12)
@@ -86,20 +86,20 @@ struct HomeScreen: View {
                 .background(Color.white.opacity(0.9), in: RoundedRectangle(cornerRadius: 10))
                 .accessibilityIdentifier("home.player.textfield")
 
-            Button("Save Player") {
+            Button("Save Name") {
                 Task {
-                    await viewModel.savePlayerName(trimmedPlayerName)
+                    await viewModel.savePlayerName(normalizedPlayerName)
                 }
             }
             .buttonStyle(.bordered)
-            .disabled(trimmedPlayerName.isEmpty)
+            .disabled(normalizedPlayerName.isEmpty)
             .accessibilityIdentifier("home.player.save")
         }
     }
 
     private var configSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Game Config")
+            Text("Game Settings")
                 .font(.headline)
 
             Picker("Grid", selection: Binding(
@@ -118,7 +118,7 @@ struct HomeScreen: View {
             .accessibilityIdentifier("home.grid.scale")
 
             HStack(spacing: 14) {
-                Toggle("Dual Numbers", isOn: Binding(
+                Toggle("Dual Mode", isOn: Binding(
                     get: { viewModel.state.gridConfig.dual },
                     set: { value in
                         var config = viewModel.state.gridConfig
@@ -143,18 +143,18 @@ struct HomeScreen: View {
 
     private var starsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Best Feedback")
+            Text("Best Rating")
                 .font(.headline)
 
             StarRowView(
                 count: viewModel.state.starCount,
                 dual: viewModel.state.gridConfig.dual,
-                showColorful: viewModel.state.showColorfulStar,
+                showColorful: viewModel.state.showsFreshFiveStarBadge,
                 size: 22
             )
 
-            if viewModel.state.showColorfulStar {
-                Text("Fresh 5-star record within 24 hours")
+            if viewModel.state.showsFreshFiveStarBadge {
+                Text("5-star record achieved in the last 24 hours")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
@@ -164,12 +164,12 @@ struct HomeScreen: View {
     private var actionsSection: some View {
         VStack(spacing: 10) {
             Button {
-                if trimmedPlayerName.isEmpty {
-                    showRequirePlayerAlert = true
+                if normalizedPlayerName.isEmpty {
+                    showsPlayerNameRequiredAlert = true
                 } else {
                     Task {
-                        if trimmedPlayerName != viewModel.state.playerName {
-                            await viewModel.savePlayerName(trimmedPlayerName)
+                        if normalizedPlayerName != viewModel.state.playerName {
+                            await viewModel.savePlayerName(normalizedPlayerName)
                         }
                         onStart()
                     }
@@ -196,7 +196,7 @@ struct HomeScreen: View {
         }
     }
 
-    private var trimmedPlayerName: String {
-        playerNameInput.trimmingCharacters(in: .whitespacesAndNewlines)
+    private var normalizedPlayerName: String {
+        playerNameDraft.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

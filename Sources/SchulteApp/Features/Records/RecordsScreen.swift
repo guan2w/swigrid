@@ -15,11 +15,11 @@ struct RecordsScreen: View {
 
     var body: some View {
         VStack(spacing: 12) {
-            Picker("Type", selection: Binding(
+            Picker("Category", selection: Binding(
                 get: { viewModel.state.selectedType },
                 set: { viewModel.selectType($0) }
             )) {
-                Text("Mine").tag(RecordsType.mine)
+                Text("My Records").tag(RecordsType.mine)
                 Text("Global").tag(RecordsType.global)
                 Text("Today").tag(RecordsType.today)
             }
@@ -42,7 +42,7 @@ struct RecordsScreen: View {
                 .pickerStyle(.menu)
                 .accessibilityIdentifier("records.grid.scale")
 
-                Toggle("Dual", isOn: Binding(
+                Toggle("Dual Mode", isOn: Binding(
                     get: { viewModel.state.selectedGridConfig.dual },
                     set: { newDual in
                         var config = viewModel.state.selectedGridConfig
@@ -71,13 +71,13 @@ struct RecordsScreen: View {
 
                             StarRowView(
                                 count: record.level,
-                                dual: record.gc.dual,
+                                dual: record.gridConfig.dual,
                                 showColorful: record.isFresh(),
                                 size: 14
                             )
                             .frame(width: 88, alignment: .leading)
 
-                            Text(record.p1.name)
+                            Text(record.player.name)
                                 .lineLimit(1)
                         }
                     }
@@ -91,7 +91,7 @@ struct RecordsScreen: View {
         .navigationTitle("Records")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Button("Refresh") {
+                Button("Reload") {
                     Task { await viewModel.refresh() }
                 }
                 .accessibilityIdentifier("records.refresh")
@@ -105,9 +105,9 @@ struct RecordsScreen: View {
     private var emptyText: String {
         switch viewModel.state.selectedType {
         case .mine:
-            "No records"
+            "No records yet"
         case .global, .today:
-            "No data"
+            "Coming soon"
         }
     }
 

@@ -44,6 +44,6 @@ final class AppFlowIntegrationTests: XCTestCase {
 
         XCTAssertEqual(recordsViewModel.state.selectedType, .mine)
         XCTAssertEqual(recordsViewModel.state.records.count, 1)
-        XCTAssertEqual(recordsViewModel.state.records.first?.p1.name, "Tester")
+        XCTAssertEqual(recordsViewModel.state.records.first?.player.name, "Tester")
     }
 }

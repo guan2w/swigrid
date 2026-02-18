@@ -45,9 +45,9 @@ public final class RecordsViewModel: ObservableObject {
     private func applyCurrentFilter() {
         switch state.selectedType {
         case .mine:
-            state.records = (allRecords.records[state.selectedGridConfig.asKey()] ?? []).sorted { lhs, rhs in
+            state.records = (allRecords.records[state.selectedGridConfig.storageKey()] ?? []).sorted { lhs, rhs in
                 if lhs.timeScore == rhs.timeScore {
-                    return lhs.t1 < rhs.t1
+                    return lhs.endTimestampMS < rhs.endTimestampMS
                 }
                 return lhs.timeScore < rhs.timeScore
             }

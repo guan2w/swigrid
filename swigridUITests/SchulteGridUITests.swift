@@ -25,7 +25,7 @@ final class SchulteGridUITests: XCTestCase {
             XCTAssertTrue(tapCell(number: number, in: app), "Missing tappable cell \(number)")
         }
 
-        let resultAlert = app.alerts["Result"]
+        let resultAlert = app.alerts["Round Complete"]
         XCTAssertTrue(resultAlert.waitForExistence(timeout: 5), "Result alert did not appear")
 
         let okButton = resultAlert.buttons["OK"]
@@ -137,7 +137,7 @@ final class SchulteGridUITests: XCTestCase {
     private func clearCurrentText(in field: XCUIElement) {
         guard let current = field.value as? String,
             !current.isEmpty,
-            current != "Input your name"
+            current != "Enter your name"
         else {
             return
         }

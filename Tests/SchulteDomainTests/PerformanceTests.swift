@@ -8,7 +8,7 @@ final class PerformanceTests: XCTestCase {
         measure(metrics: [XCTClockMetric()]) {
             var sum = 0
             for i in 0 ..< 10_000 {
-                sum += ScoringRule.evalLevel(scoreMS: Int64(1_000 + i), config: config)
+                sum += ScoringRule.evaluateLevel(scoreMilliseconds: Int64(1_000 + i), config: config)
             }
             XCTAssertGreaterThanOrEqual(sum, 0)
         }

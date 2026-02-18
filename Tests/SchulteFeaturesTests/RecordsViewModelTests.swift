@@ -9,15 +9,15 @@ final class RecordsViewModelTests: XCTestCase {
         let configB = GridConfig(scale: 4, dual: false)
 
         var scoreRecords = ScoreRecords()
-        scoreRecords.saveRecord(try ScoreRecord(p1: Player(name: "A"), gc: configA, t0: 1_000, t1: 3_000))
-        scoreRecords.saveRecord(try ScoreRecord(p1: Player(name: "B"), gc: configB, t0: 1_000, t1: 4_000))
+        scoreRecords.saveRecord(try ScoreRecord(player: Player(name: "A"), gridConfig: configA, startTimestampMS: 1_000, endTimestampMS: 3_000))
+        scoreRecords.saveRecord(try ScoreRecord(player: Player(name: "B"), gridConfig: configB, startTimestampMS: 1_000, endTimestampMS: 4_000))
 
         let repository = MockScoreRecordRepository(scoreRecords: scoreRecords)
         let viewModel = RecordsViewModel(scoreRecordRepository: repository)
 
         await viewModel.load(initialGridConfig: configA)
         XCTAssertEqual(viewModel.state.records.count, 1)
-        XCTAssertEqual(viewModel.state.records.first?.p1.name, "A")
+        XCTAssertEqual(viewModel.state.records.first?.player.name, "A")
 
         viewModel.selectType(.global)
         XCTAssertTrue(viewModel.state.records.isEmpty)
@@ -25,6 +25,6 @@ final class RecordsViewModelTests: XCTestCase {
         viewModel.selectType(.mine)
         viewModel.updateGridConfig(configB)
         XCTAssertEqual(viewModel.state.records.count, 1)
-        XCTAssertEqual(viewModel.state.records.first?.p1.name, "B")
+        XCTAssertEqual(viewModel.state.records.first?.player.name, "B")
     }
 }

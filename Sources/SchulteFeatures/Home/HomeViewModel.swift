@@ -82,14 +82,14 @@ public final class HomeViewModel: ObservableObject {
             updateStars(with: scoreRecords)
         } catch {
             state.starCount = 0
-            state.showColorfulStar = false
+            state.showsFreshFiveStarBadge = false
         }
     }
 
     private func updateStars(with records: ScoreRecords) {
         let best = records.best(state.gridConfig)?.level
-        let latestFiveStar = records.latestLevel5Record(state.gridConfig)
+        let latestFiveStar = records.latestFiveStarRecord(state.gridConfig)
         state.starCount = latestFiveStar?.level ?? best ?? 0
-        state.showColorfulStar = latestFiveStar?.isFresh() ?? false
+        state.showsFreshFiveStarBadge = latestFiveStar?.isFresh() ?? false
     }
 }

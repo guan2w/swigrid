@@ -10,15 +10,15 @@ final class ScoreRecordsTests: XCTestCase {
             let start: Int64 = 1_000
             let end = start + Int64(5_000 - i * 50)
             let record = try ScoreRecord(
-                p1: Player(name: "P\(i)"),
-                gc: config,
-                t0: start,
-                t1: end
+                player: Player(name: "P\(i)"),
+                gridConfig: config,
+                startTimestampMS: start,
+                endTimestampMS: end
             )
             records.saveRecord(record)
         }
 
-        let list = records.records[config.asKey()]
+        let list = records.records[config.storageKey()]
         XCTAssertEqual(list?.count, 20)
 
         let sorted = list?.map(\.timeScore) ?? []
@@ -29,31 +29,31 @@ final class ScoreRecordsTests: XCTestCase {
         var records = ScoreRecords()
         let config = GridConfig(scale: 3, dual: false)
 
-        let normal = try ScoreRecord(p1: Player(name: "A"), gc: config, t0: 1_000, t1: 8_000)
-        let fiveStar = try ScoreRecord(p1: Player(name: "B"), gc: config, t0: 1_000, t1: 2_500)
+        let normal = try ScoreRecord(player: Player(name: "A"), gridConfig: config, startTimestampMS: 1_000, endTimestampMS: 8_000)
+        let fiveStar = try ScoreRecord(player: Player(name: "B"), gridConfig: config, startTimestampMS: 1_000, endTimestampMS: 2_500)
 
         records.saveRecord(normal)
         records.saveRecord(fiveStar)
 
-        XCTAssertEqual(records.latestLevel5Record(config)?.p1.name, "B")
-        XCTAssertEqual(records.best(config)?.p1.name, "B")
+        XCTAssertEqual(records.latestFiveStarRecord(config)?.player.name, "B")
+        XCTAssertEqual(records.best(config)?.player.name, "B")
     }
 
     func testNormalizedSortsAndKeepsLatestLevel5FromLegacyPayload() throws {
         let config = GridConfig(scale: 3, dual: false)
-        let key = config.asKey()
+        let key = config.storageKey()
 
-        let slow = try ScoreRecord(p1: Player(name: "Slow"), gc: config, t0: 1_000, t1: 6_000)
-        let fast = try ScoreRecord(p1: Player(name: "Fast"), gc: config, t0: 1_000, t1: 3_000)
-        let latestFive = try ScoreRecord(p1: Player(name: "Latest5"), gc: config, t0: 9_000, t1: 10_500)
+        let slow = try ScoreRecord(player: Player(name: "Slow"), gridConfig: config, startTimestampMS: 1_000, endTimestampMS: 6_000)
+        let fast = try ScoreRecord(player: Player(name: "Fast"), gridConfig: config, startTimestampMS: 1_000, endTimestampMS: 3_000)
+        let latestFive = try ScoreRecord(player: Player(name: "Latest5"), gridConfig: config, startTimestampMS: 9_000, endTimestampMS: 10_500)
 
         let legacy = ScoreRecords(
             records: [key: [slow, fast]],
-            latestLevel5Records: [key: latestFive]
+            latestFiveStarRecords: [key: latestFive]
         )
 
         let normalized = legacy.normalized()
-        XCTAssertEqual(normalized.records[key]?.map(\.p1.name), ["Fast", "Slow"])
-        XCTAssertEqual(normalized.latestLevel5Records[key]?.p1.name, "Latest5")
+        XCTAssertEqual(normalized.records[key]?.map(\.player.name), ["Fast", "Slow"])
+        XCTAssertEqual(normalized.latestFiveStarRecords[key]?.player.name, "Latest5")
     }
 }

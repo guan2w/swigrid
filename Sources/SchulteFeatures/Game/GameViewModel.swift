@@ -17,7 +17,7 @@ public final class GameViewModel: ObservableObject {
     public func reset() {
         session = nil
         gridConfig = nil
-        state = GameState(status: .ready, countdown: 3, nextNumber: nil, elapsedMS: 0, gridNumbers: nil, highlightedNumber: nil)
+        state = GameState(status: .ready, countdown: 3, nextNumber: nil, elapsedMilliseconds: 0, gridNumbers: nil, highlightedNumber: nil)
     }
 
     public func configure(gridConfig: GridConfig) throws {
@@ -27,7 +27,7 @@ public final class GameViewModel: ObservableObject {
             status: .ready,
             countdown: 3,
             nextNumber: 1,
-            elapsedMS: 0,
+            elapsedMilliseconds: 0,
             gridNumbers: GridGenerator.generate(config: gridConfig),
             highlightedNumber: nil
         )
@@ -72,7 +72,7 @@ public final class GameViewModel: ObservableObject {
         case .finished:
             state.status = .finished
             state.nextNumber = nil
-            state.elapsedMS = session.timeScore ?? state.elapsedMS
+            state.elapsedMilliseconds = session.timeScore ?? state.elapsedMilliseconds
             state.highlightedNumber = nil
         }
 
@@ -88,7 +88,7 @@ public final class GameViewModel: ObservableObject {
             return
         }
 
-        state.elapsedMS = now() - start
+        state.elapsedMilliseconds = now() - start
     }
 
     public func toggleNextHint() {

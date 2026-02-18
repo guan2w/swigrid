@@ -2,18 +2,17 @@
 
 
 ### v1.0.0
-- Finish basic functionality
+- Delivered the core gameplay experience
     - Game
-        - Grid size
-        - Game sound/switch
-        - Timer
-        - _Next_ hint
-        - Player name
+        - Grid size options
+        - Sound toggle
+        - Timer display
+        - _Next Number_ hint
+        - Player name setup
     - Records
-        - Persistence & encryption
-    - Colorful 5 stars
-        - Lasts for one day
-    - Animated background
-        - Splitting grids
-    - About
-    - Help
+        - Local persistence and secure storage
+    - 5-star highlight
+        - Stays active for 24 hours
+    - Animated split-grid background
+    - About page
+    - Help page

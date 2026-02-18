@@ -33,17 +33,17 @@ final class LocalRepositoriesTests: XCTestCase {
         let repository = LocalScoreRecordRepository(store: store)
         let config = GridConfig(scale: 3, dual: false)
 
-        let slower = try ScoreRecord(p1: Player(name: "Slow"), gc: config, t0: 1_000, t1: 5_000)
-        let faster = try ScoreRecord(p1: Player(name: "Fast"), gc: config, t0: 1_000, t1: 2_000)
+        let slower = try ScoreRecord(player: Player(name: "Slow"), gridConfig: config, startTimestampMS: 1_000, endTimestampMS: 5_000)
+        let faster = try ScoreRecord(player: Player(name: "Fast"), gridConfig: config, startTimestampMS: 1_000, endTimestampMS: 2_000)
 
         try await repository.save(slower)
         try await repository.save(faster)
 
         let all = try await repository.loadAll()
-        let list = all.records[config.asKey()] ?? []
+        let list = all.records[config.storageKey()] ?? []
 
-        XCTAssertEqual(list.map(\.p1.name), ["Fast", "Slow"])
-        XCTAssertEqual(all.best(config)?.p1.name, "Fast")
+        XCTAssertEqual(list.map(\.player.name), ["Fast", "Slow"])
+        XCTAssertEqual(all.best(config)?.player.name, "Fast")
     }
 
     func testMutePersistenceUsingUseCase() async throws {
@@ -68,19 +68,19 @@ final class LocalRepositoriesTests: XCTestCase {
         let repository = LocalScoreRecordRepository(store: store)
         let config = GridConfig(scale: 3, dual: false)
 
-        let slow = try ScoreRecord(p1: Player(name: "Slow"), gc: config, t0: 1_000, t1: 6_000)
-        let fast = try ScoreRecord(p1: Player(name: "Fast"), gc: config, t0: 1_000, t1: 3_000)
-        let latestFive = try ScoreRecord(p1: Player(name: "Latest5"), gc: config, t0: 9_000, t1: 10_500)
+        let slow = try ScoreRecord(player: Player(name: "Slow"), gridConfig: config, startTimestampMS: 1_000, endTimestampMS: 6_000)
+        let fast = try ScoreRecord(player: Player(name: "Fast"), gridConfig: config, startTimestampMS: 1_000, endTimestampMS: 3_000)
+        let latestFive = try ScoreRecord(player: Player(name: "Latest5"), gridConfig: config, startTimestampMS: 9_000, endTimestampMS: 10_500)
 
         let payload = ScoreRecords(
-            records: [config.asKey(): [slow, fast]],
-            latestLevel5Records: [config.asKey(): latestFive]
+            records: [config.storageKey(): [slow, fast]],
+            latestFiveStarRecords: [config.storageKey(): latestFive]
         )
         let encoded = try JSONEncoder().encode(payload)
         try await store.setData(encoded, forKey: StorageKeys.localRecords)
 
         let loaded = try await repository.loadAll()
-        XCTAssertEqual(loaded.records[config.asKey()]?.map(\.p1.name), ["Fast", "Slow"])
-        XCTAssertEqual(loaded.latestLevel5Record(config)?.p1.name, "Latest5")
+        XCTAssertEqual(loaded.records[config.storageKey()]?.map(\.player.name), ["Fast", "Slow"])
+        XCTAssertEqual(loaded.latestFiveStarRecord(config)?.player.name, "Latest5")
     }
 }
