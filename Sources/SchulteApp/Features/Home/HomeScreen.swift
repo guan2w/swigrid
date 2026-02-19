@@ -31,32 +31,18 @@ struct HomeScreen: View {
     }
 
     var body: some View {
-        ZStack {
-            SplitGridBackgroundView()
-                .overlay(Color.white.opacity(0.25))
+        GeometryReader { geo in
+            ZStack {
+                SplitGridBackgroundView()
+                    .overlay(Color.white.opacity(0.25))
 
-            ScrollView {
-                VStack(spacing: 18) {
-                    Text("Schulte Grid")
-                        .font(.custom("Sanvito", size: 52))
-                        .foregroundStyle(Color(red: 0.05, green: 0.34, blue: 0.49))
-                        .padding(.top, 12)
-
-                    VStack(spacing: 14) {
-                        playerSection
-                        configSection
-                        starsSection
-                        actionsSection
-                    }
-                    .padding(16)
-                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 18)
-                            .stroke(Color.white.opacity(0.65), lineWidth: 1)
-                    )
+                VStack(spacing: 0) {
+                    titleArea
+                    middleArea(screenWidth: geo.size.width)
+                    startButton
+                        .padding(.horizontal, 36)
+                        .padding(.bottom, 20)
                 }
-                .frame(maxWidth: 620)
-                .padding(16)
             }
         }
         .task {
@@ -70,130 +56,137 @@ struct HomeScreen: View {
         }
     }
 
-    private var playerSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Player Name")
-                .font(.headline)
-
-            TextField("Enter your name", text: $playerNameDraft)
-                .onChange(of: playerNameDraft) { _, newValue in
-                    if newValue.count > Player.maxNameLength {
-                        playerNameDraft = String(newValue.prefix(Player.maxNameLength))
-                    }
-                }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
-                .background(Color.white.opacity(0.9), in: RoundedRectangle(cornerRadius: 10))
-                .accessibilityIdentifier("home.player.textfield")
-
-            Button("Save Name") {
-                Task {
-                    await viewModel.savePlayerName(normalizedPlayerName)
-                }
-            }
-            .buttonStyle(.bordered)
-            .disabled(normalizedPlayerName.isEmpty)
-            .accessibilityIdentifier("home.player.save")
+    private var titleArea: some View {
+        ZStack {
+            Color(red: 1.0, green: 0.93, blue: 0.82).opacity(0.6)
+            Text("Schulte Grid")
+                .font(.custom("Sanvito", size: 60))
+                .foregroundStyle(Color(red: 0.05, green: 0.34, blue: 0.49))
         }
+        .frame(height: 110)
     }
 
-    private var configSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Game Settings")
-                .font(.headline)
-
-            Picker("Grid", selection: Binding(
-                get: { viewModel.state.gridConfig.scale },
-                set: { newScale in
-                    var config = viewModel.state.gridConfig
-                    config.scale = newScale
-                    Task { await viewModel.setGridConfig(config) }
-                }
-            )) {
-                ForEach(GridConfig.allowedScales, id: \.self) { scale in
-                    Text("\(scale)x\(scale)").tag(scale)
-                }
+    private func middleArea(screenWidth: CGFloat) -> some View {
+        VStack(spacing: 0) {
+            Spacer()
+            HStack(spacing: 0) {
+                muteButton
+                GridConfiguratorView(scale: scaleBinding, dual: dualBinding)
+                aboutButton
             }
-            .pickerStyle(.segmented)
-            .accessibilityIdentifier("home.grid.scale")
-
-            HStack(spacing: 14) {
-                Toggle("Dual Mode", isOn: Binding(
-                    get: { viewModel.state.gridConfig.dual },
-                    set: { value in
-                        var config = viewModel.state.gridConfig
-                        config.dual = value
-                        Task { await viewModel.setGridConfig(config) }
-                    }
-                ))
-                .accessibilityIdentifier("home.grid.dual")
-
-                Toggle("Mute", isOn: Binding(
-                    get: { viewModel.state.mute },
-                    set: { value in
-                        Task { await viewModel.setMute(value) }
-                    }
-                ))
-                .accessibilityIdentifier("home.audio.mute")
-            }
-            .toggleStyle(.switch)
-            .font(.subheadline)
-        }
-    }
-
-    private var starsSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Best Rating")
-                .font(.headline)
-
+            .padding(.horizontal, 16)
+            Spacer()
             StarRowView(
                 count: viewModel.state.starCount,
                 dual: viewModel.state.gridConfig.dual,
                 showColorful: viewModel.state.showsFreshFiveStarBadge,
-                size: 22
+                size: screenWidth / 11
             )
-
-            if viewModel.state.showsFreshFiveStarBadge {
-                Text("5-star record achieved in the last 24 hours")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
+            Spacer()
+            HStack(spacing: 12) {
+                playerTextField
+                recordsButton
             }
+            .padding(.horizontal, 20)
+            Spacer()
         }
     }
 
-    private var actionsSection: some View {
-        VStack(spacing: 10) {
-            Button {
-                if normalizedPlayerName.isEmpty {
-                    showsPlayerNameRequiredAlert = true
-                } else {
-                    Task {
-                        if normalizedPlayerName != viewModel.state.playerName {
-                            await viewModel.savePlayerName(normalizedPlayerName)
-                        }
-                        onStart()
-                    }
-                }
-            } label: {
-                Text("Start")
-                    .frame(maxWidth: .infinity)
-                    .font(.system(size: 30, weight: .semibold, design: .rounded))
-                    .padding(.vertical, 8)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(Color(red: 0.1, green: 0.55, blue: 0.78))
-            .accessibilityIdentifier("home.start")
-
-            HStack(spacing: 12) {
-                Button("Records") { onRecords() }
-                    .buttonStyle(.bordered)
-                    .accessibilityIdentifier("home.records")
-
-                Button("About") { onAbout() }
-                    .buttonStyle(.bordered)
-                    .accessibilityIdentifier("home.about")
-            }
+    private var muteButton: some View {
+        Button {
+            Task { await viewModel.setMute(!viewModel.state.mute) }
+        } label: {
+            Image(systemName: viewModel.state.mute ? "speaker.slash.fill" : "speaker.wave.2.fill")
+                .font(.system(size: 22))
+                .foregroundStyle(Color(red: 0.05, green: 0.34, blue: 0.49))
+                .frame(width: 44, height: 44)
         }
+        .accessibilityIdentifier("home.audio.mute")
+    }
+
+    private var aboutButton: some View {
+        Button { onAbout() } label: {
+            Image(systemName: "info.circle")
+                .font(.system(size: 22))
+                .foregroundStyle(Color(red: 0.05, green: 0.34, blue: 0.49))
+                .frame(width: 44, height: 44)
+        }
+        .accessibilityIdentifier("home.about")
+    }
+
+    private var playerTextField: some View {
+        TextField("Enter your name", text: $playerNameDraft)
+            .onChange(of: playerNameDraft) { _, newValue in
+                if newValue.count > Player.maxNameLength {
+                    playerNameDraft = String(newValue.prefix(Player.maxNameLength))
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .background(Color.white.opacity(0.85), in: RoundedRectangle(cornerRadius: 10))
+            .accessibilityIdentifier("home.player.textfield")
+    }
+
+    private var recordsButton: some View {
+        Button { onRecords() } label: {
+            Image(systemName: "list.bullet.rectangle")
+                .font(.system(size: 22))
+                .foregroundStyle(Color(red: 0.05, green: 0.34, blue: 0.49))
+                .frame(width: 44, height: 44)
+        }
+        .accessibilityIdentifier("home.records")
+    }
+
+    private var startButton: some View {
+        Button {
+            if normalizedPlayerName.isEmpty {
+                showsPlayerNameRequiredAlert = true
+            } else {
+                Task {
+                    if normalizedPlayerName != viewModel.state.playerName {
+                        await viewModel.savePlayerName(normalizedPlayerName)
+                    }
+                    onStart()
+                }
+            }
+        } label: {
+            Text("Start")
+                .font(.system(size: 30, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 52)
+                .background(
+                    LinearGradient(
+                        colors: [Color(red: 0.1, green: 0.55, blue: 0.78), Color(red: 0.05, green: 0.40, blue: 0.65)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    in: RoundedRectangle(cornerRadius: 30)
+                )
+        }
+        .accessibilityIdentifier("home.start")
+    }
+
+    private var scaleBinding: Binding<Int> {
+        Binding(
+            get: { viewModel.state.gridConfig.scale },
+            set: { newScale in
+                var config = viewModel.state.gridConfig
+                config.scale = newScale
+                Task { await viewModel.setGridConfig(config) }
+            }
+        )
+    }
+
+    private var dualBinding: Binding<Bool> {
+        Binding(
+            get: { viewModel.state.gridConfig.dual },
+            set: { value in
+                var config = viewModel.state.gridConfig
+                config.dual = value
+                Task { await viewModel.setGridConfig(config) }
+            }
+        )
     }
 
     private var normalizedPlayerName: String {
