@@ -13,7 +13,8 @@ final class RecordsViewModelTests: XCTestCase {
         scoreRecords.saveRecord(try ScoreRecord(player: Player(name: "B"), gridConfig: configB, startTimestampMS: 1_000, endTimestampMS: 4_000))
 
         let repository = MockScoreRecordRepository(scoreRecords: scoreRecords)
-        let viewModel = RecordsViewModel(scoreRecordRepository: repository)
+        let gameConfigRepo = MockGameConfigRepository(config: GameConfig(gridConfig: configA, mute: false))
+        let viewModel = RecordsViewModel(scoreRecordRepository: repository, gameConfigRepository: gameConfigRepo)
 
         await viewModel.load(initialGridConfig: configA)
         XCTAssertEqual(viewModel.state.records.count, 1)

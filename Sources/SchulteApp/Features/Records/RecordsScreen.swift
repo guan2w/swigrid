@@ -4,16 +4,21 @@ import SchulteFeatures
 
 struct RecordsScreen: View {
     @StateObject private var viewModel: RecordsViewModel
-    private let gameConfigRepository: any GameConfigRepository
 
-    init(dependency: AppDependency) {
+    private let initialGridConfig: GridConfig
+
+    init(dependency: AppDependency, initialGridConfig: GridConfig) {
         _viewModel = StateObject(
-            wrappedValue: RecordsViewModel(scoreRecordRepository: dependency.scoreRecordRepository)
+            wrappedValue: RecordsViewModel(
+                scoreRecordRepository: dependency.scoreRecordRepository,
+                gameConfigRepository: dependency.gameConfigRepository
+            )
         )
-        self.gameConfigRepository = dependency.gameConfigRepository
+        self.initialGridConfig = initialGridConfig
     }
 
     var body: some View {
+        GeometryReader { geo in
         VStack(spacing: 12) {
             Picker("Category", selection: Binding(
                 get: { viewModel.state.selectedType },
@@ -26,33 +31,26 @@ struct RecordsScreen: View {
             .pickerStyle(.segmented)
             .accessibilityIdentifier("records.type")
 
-            HStack {
-                Picker("Grid", selection: Binding(
+            GridConfiguratorView(
+                scale: Binding(
                     get: { viewModel.state.selectedGridConfig.scale },
                     set: { newScale in
                         var config = viewModel.state.selectedGridConfig
                         config.scale = newScale
                         viewModel.updateGridConfig(config)
                     }
-                )) {
-                    ForEach(GridConfig.allowedScales, id: \.self) { scale in
-                        Text("\(scale)x\(scale)").tag(scale)
-                    }
-                }
-                .pickerStyle(.menu)
-                .accessibilityIdentifier("records.grid.scale")
-
-                Toggle("Dual Mode", isOn: Binding(
+                ),
+                dual: Binding(
                     get: { viewModel.state.selectedGridConfig.dual },
                     set: { newDual in
                         var config = viewModel.state.selectedGridConfig
                         config.dual = newDual
                         viewModel.updateGridConfig(config)
                     }
-                ))
-                .toggleStyle(.switch)
-                .accessibilityIdentifier("records.grid.dual")
-            }
+                ),
+                width: geo.size.width * 0.45
+            )
+            .accessibilityIdentifier("records.grid.scale")
 
             if viewModel.state.records.isEmpty {
                 Text(emptyText)
@@ -86,6 +84,7 @@ struct RecordsScreen: View {
                 .accessibilityIdentifier("records.list")
             }
         }
+        }
         .frame(maxWidth: 720)
         .padding(16)
         .navigationTitle("Records")
@@ -98,7 +97,7 @@ struct RecordsScreen: View {
             }
         }
         .task {
-            await loadInitial()
+            await viewModel.load(initialGridConfig: initialGridConfig)
         }
     }
 
@@ -108,15 +107,6 @@ struct RecordsScreen: View {
             "No records yet"
         case .global, .today:
             "Coming soon"
-        }
-    }
-
-    private func loadInitial() async {
-        do {
-            let config = try await gameConfigRepository.loadConfig()
-            await viewModel.load(initialGridConfig: config.gridConfig)
-        } catch {
-            await viewModel.load(initialGridConfig: GridConfig())
         }
     }
 }

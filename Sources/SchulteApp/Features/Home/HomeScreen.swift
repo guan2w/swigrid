@@ -6,7 +6,7 @@ struct HomeScreen: View {
     @StateObject private var viewModel: HomeViewModel
 
     private let onStart: () -> Void
-    private let onRecords: () -> Void
+    private let onRecords: (GridConfig) -> Void
     private let onAbout: () -> Void
 
     @State private var playerNameDraft = ""
@@ -15,7 +15,7 @@ struct HomeScreen: View {
     init(
         dependency: AppDependency,
         onStart: @escaping () -> Void,
-        onRecords: @escaping () -> Void,
+        onRecords: @escaping (GridConfig) -> Void,
         onAbout: @escaping () -> Void
     ) {
         _viewModel = StateObject(
@@ -131,7 +131,7 @@ struct HomeScreen: View {
     }
 
     private var recordsButton: some View {
-        Button { onRecords() } label: {
+        Button { onRecords(viewModel.state.gridConfig) } label: {
             Image(systemName: "list.bullet.rectangle")
                 .font(.system(size: 22))
                 .foregroundStyle(Color(red: 0.05, green: 0.34, blue: 0.49))

@@ -1,7 +1,7 @@
-import Foundation
+import SchulteDomain
 
 enum AppRoute: Hashable {
     case game
-    case records
+    case records(GridConfig)
     case about
 }

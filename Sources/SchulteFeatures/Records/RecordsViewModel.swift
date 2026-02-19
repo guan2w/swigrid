@@ -7,10 +7,12 @@ public final class RecordsViewModel: ObservableObject {
     @Published public private(set) var state = RecordsState()
 
     private let scoreRecordRepository: any ScoreRecordRepository
+    private let gameConfigRepository: any GameConfigRepository
     private var allRecords = ScoreRecords()
 
-    public init(scoreRecordRepository: any ScoreRecordRepository) {
+    public init(scoreRecordRepository: any ScoreRecordRepository, gameConfigRepository: any GameConfigRepository) {
         self.scoreRecordRepository = scoreRecordRepository
+        self.gameConfigRepository = gameConfigRepository
     }
 
     public func load(initialGridConfig: GridConfig) async {
@@ -31,6 +33,11 @@ public final class RecordsViewModel: ObservableObject {
     public func updateGridConfig(_ config: GridConfig) {
         state.selectedGridConfig = config
         applyCurrentFilter()
+        Task {
+            try? await gameConfigRepository.saveConfig(
+                GameConfig(gridConfig: config, mute: (try? await gameConfigRepository.loadConfig().mute) ?? false)
+            )
+        }
     }
 
     public func refresh() async {

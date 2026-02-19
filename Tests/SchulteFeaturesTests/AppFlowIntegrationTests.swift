@@ -39,7 +39,7 @@ final class AppFlowIntegrationTests: XCTestCase {
         let record = try gameViewModel.finalizeRecord(player: player)
         try await scoreRepository.save(record)
 
-        let recordsViewModel = RecordsViewModel(scoreRecordRepository: scoreRepository)
+        let recordsViewModel = RecordsViewModel(scoreRecordRepository: scoreRepository, gameConfigRepository: gameConfigRepository)
         await recordsViewModel.load(initialGridConfig: newConfig)
 
         XCTAssertEqual(recordsViewModel.state.selectedType, .mine)

@@ -34,5 +34,6 @@ struct GridConfiguratorView: View {
         }
         .onTapGesture { dual.toggle() }
         .onAppear { scrolledID = scale }
+        .onChange(of: scale) { _, newValue in scrolledID = newValue }
     }
 }
