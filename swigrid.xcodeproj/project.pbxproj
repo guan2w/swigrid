@@ -21,6 +21,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		070205E82F47327700D14E7D /* create-project.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "create-project.swift"; sourceTree = "<group>"; };
+		070205E92F47327F00D14E7D /* Instructions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Instructions.swift; sourceTree = "<group>"; };
 		07D0FF932F45B38D00D2ED01 /* swigrid.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = swigrid.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1B2C3E12F48000100D2ED01 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = SOURCE_ROOT; };
 		B20C00012F47000100D2ED01 /* swigridUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = swigridUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -77,6 +79,8 @@
 				A1B2C3E32F48000100D2ED01 /* Tests */,
 				A1B2C3E12F48000100D2ED01 /* Package.swift */,
 				07D0FF942F45B38D00D2ED01 /* Products */,
+				070205E82F47327700D14E7D /* create-project.swift */,
+				070205E92F47327F00D14E7D /* Instructions.swift */,
 			);
 			sourceTree = "<group>";
 		};

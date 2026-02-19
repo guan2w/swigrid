@@ -71,7 +71,9 @@ struct HomeScreen: View {
             Spacer()
             HStack(spacing: 0) {
                 muteButton
-                GridConfiguratorView(scale: scaleBinding, dual: dualBinding)
+                Spacer()
+                GridConfiguratorView(scale: scaleBinding, dual: dualBinding, width: screenWidth * 0.45)
+                Spacer()
                 aboutButton
             }
             .padding(.horizontal, 16)
@@ -82,6 +84,7 @@ struct HomeScreen: View {
                 showColorful: viewModel.state.showsFreshFiveStarBadge,
                 size: screenWidth / 11
             )
+            .frame(height: screenWidth / 11)
             Spacer()
             HStack(spacing: 12) {
                 playerTextField
