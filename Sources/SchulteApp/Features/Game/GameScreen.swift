@@ -23,6 +23,8 @@ struct GameScreen: View {
     @State private var resultLevel = 0
     @State private var errorMessage: String? = nil
 
+    @State private var flashIndex: Int?
+
     @State private var audioService = AudioService()
     @State private var hapticService = HapticService()
 
@@ -46,7 +48,10 @@ struct GameScreen: View {
                             .font(.system(size: 18))
                             .foregroundStyle(Color(red: 0.22, green: 0.29, blue: 0.31))
                         Button {
-                            viewModel.toggleNextHint()
+                            if let next = viewModel.state.nextNumber,
+                               let idx = displayedNumbers.firstIndex(of: next) {
+                                triggerFlash(at: idx)
+                            }
                             hapticService.nextHintTap()
                         } label: {
                             Text(viewModel.state.nextNumber.map(String.init) ?? "-")
@@ -150,27 +155,20 @@ struct GameScreen: View {
         return LazyVGrid(columns: columns, spacing: 6) {
             ForEach(displayedNumbers.indices, id: \.self) { index in
                 let displayNumber = displayedNumbers[index]
-                let isHighlighted = (viewModel.state.highlightedNumber == displayNumber)
-
+                let isFlashing = (flashIndex == index)
                 Button {
                     handleCellTap(index: index)
                 } label: {
                     ZStack {
                         RoundedRectangle(cornerRadius: 10)
-                            .fill(Color(white: 0.933))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(isHighlighted ? Color.teal.opacity(0.9) : Color.clear, lineWidth: 3)
-                            )
+                            .fill(isFlashing ? Color.teal.opacity(0.25) : Color(white: 0.933))
 
                         Text(displayNumber.map(String.init) ?? "")
                             .font(.custom("ErasITC-Demi", size: fontSize))
                             .foregroundStyle(Color(red: 0.216, green: 0.278, blue: 0.310).opacity(Double(scale + 9) / 20.0))
                     }
                     .frame(height: cellSize)
-                    .scaleEffect(isHighlighted ? 1.04 : 1.0)
-                    .shadow(color: isHighlighted ? Color.teal.opacity(0.35) : .clear, radius: 8, x: 0, y: 0)
-                    .animation(.easeInOut(duration: 0.25), value: isHighlighted)
+                    .animation(.easeInOut(duration: 0.15), value: isFlashing)
                 }
                 .buttonStyle(.plain)
                 .disabled(displayNumber == nil || viewModel.state.status != .ongoing)
@@ -228,14 +226,17 @@ struct GameScreen: View {
         case .correct, .finished:
             audioService.play(.correct, muted: isMuted)
             hapticService.correctTap()
-            if let deferredSecondRoundNumbers {
-                if displayedNumbers[index] == deferredSecondRoundNumbers[index] {
-                    displayedNumbers[index] = nil
+            triggerFlash(at: index)
+            withAnimation(.easeOut(duration: 0.15)) {
+                if let deferredSecondRoundNumbers {
+                    if displayedNumbers[index] == deferredSecondRoundNumbers[index] {
+                        displayedNumbers[index] = nil
+                    } else {
+                        displayedNumbers[index] = deferredSecondRoundNumbers[index]
+                    }
                 } else {
-                    displayedNumbers[index] = deferredSecondRoundNumbers[index]
+                    displayedNumbers[index] = nil
                 }
-            } else {
-                displayedNumbers[index] = nil
             }
         }
     }
@@ -255,6 +256,13 @@ struct GameScreen: View {
             showsResultAlert = true
         } catch {
             errorMessage = "Failed to save the result: \(error.localizedDescription)"
+        }
+    }
+
+    private func triggerFlash(at index: Int) {
+        flashIndex = index
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+            if flashIndex == index { flashIndex = nil }
         }
     }
 
