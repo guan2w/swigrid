@@ -3,10 +3,10 @@ import Foundation
 
 enum FontCatalog {
     static func registerAll() {
-        register("Crasng.ttf")
-        register("digital-7.ttf")
-        register("Eras-Demi-ITC.ttf")
-        register("SanvitoPro-LtDisp.otf")
+        register("Crasng.ttf") // CrashNumberingGothic
+        register("digital-7.ttf") // Digital-7MonoItalic
+        register("Eras-Demi-ITC.ttf") // ErasITC-Demi
+        register("SanvitoPro-LtDisp.otf") // SanvitoPro-LtDisp
     }
 
     private static func register(_ filename: String) {

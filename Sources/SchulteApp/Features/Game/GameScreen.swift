@@ -50,7 +50,7 @@ struct GameScreen: View {
                             hapticService.nextHintTap()
                         } label: {
                             Text(viewModel.state.nextNumber.map(String.init) ?? "-")
-                                .font(.custom("Eras-Demi-ITC", size: proxy.size.width / 9))
+                                .font(.custom("ErasITC-Demi", size: proxy.size.width / 9))
                                 .foregroundStyle(Color(red: 0.47, green: 0.33, blue: 0.28).opacity(0.4))
                         }
                         .buttonStyle(.borderless)
@@ -65,7 +65,7 @@ struct GameScreen: View {
                             .font(.system(size: 18))
                             .foregroundStyle(Color(red: 0.22, green: 0.29, blue: 0.31))
                         Text(formatSeconds(viewModel.state.elapsedMilliseconds))
-                            .font(.custom("digital-7", size: proxy.size.width / 5.5))
+                            .font(.custom("Digital-7MonoItalic", size: proxy.size.width / 5.5))
                             .foregroundStyle(Color(red: 0.976, green: 0.659, blue: 0.145))
                             .shadow(color: Color(red: 0.976, green: 0.659, blue: 0.145), radius: 1)
                             .accessibilityIdentifier("game.timer")
@@ -79,11 +79,11 @@ struct GameScreen: View {
                 }
 
                 ZStack {
-                    gridView(side: gridSide)
+                    gridView(side: gridSide, screenWidth: proxy.size.width)
                         .overlay(alignment: .center) {
                             if viewModel.state.status == .ready {
                                 Text(viewModel.state.countdown > 0 ? "\(viewModel.state.countdown)" : "Go")
-                                    .font(.custom("CrashNumbering", size: 150))
+                                    .font(.custom("CrashNumberingGothic", size: 150))
                                     .foregroundStyle(.green.opacity(0.7))
                                     .shadow(color: Color.black.opacity(0.13), radius: 4)
                             }
@@ -140,12 +140,12 @@ struct GameScreen: View {
         }
     }
 
-    private func gridView(side: CGFloat) -> some View {
+    private func gridView(side: CGFloat, screenWidth: CGFloat) -> some View {
         let spacing: CGFloat = 6
         let scale = max(activeGridConfig.scale, 1)
         let columns = Array(repeating: GridItem(.flexible(), spacing: spacing), count: scale)
         let cellSize = max((side - CGFloat(scale - 1) * spacing) / CGFloat(scale), 44)
-        let fontSize = floor((side - 30) / CGFloat(scale) / 2)
+        let fontSize = floor((screenWidth - 30) / CGFloat(scale) / 2)
 
         return LazyVGrid(columns: columns, spacing: 6) {
             ForEach(displayedNumbers.indices, id: \.self) { index in
@@ -164,7 +164,7 @@ struct GameScreen: View {
                             )
 
                         Text(displayNumber.map(String.init) ?? "")
-                            .font(.custom("Eras-Demi-ITC", size: fontSize))
+                            .font(.custom("ErasITC-Demi", size: fontSize))
                             .foregroundStyle(Color(red: 0.216, green: 0.278, blue: 0.310).opacity(Double(scale + 9) / 20.0))
                     }
                     .frame(height: cellSize)

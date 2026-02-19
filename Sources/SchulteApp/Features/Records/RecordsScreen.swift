@@ -67,7 +67,7 @@ struct RecordsScreen: View {
                                 .frame(width: 42, alignment: .center)
 
                             Text(String(format: "%.2f", record.timeScoreAsSeconds))
-                                .font(.custom("digital-7", size: contentFontSize * 1.3))
+                                .font(.custom("Digital-7MonoItalic", size: contentFontSize * 1.3))
                                 .fontWeight(.bold)
                                 .foregroundStyle(Color(red: 0.976, green: 0.659, blue: 0.145))
                                 .frame(width: 78, alignment: .leading)

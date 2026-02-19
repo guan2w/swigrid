@@ -60,7 +60,7 @@ struct HomeScreen: View {
         ZStack {
             Color.orange.opacity(0.04)
             Text("Schulte Grid")
-                .font(.custom("Sanvito", size: 60))
+                .font(.custom("SanvitoPro-LtDisp", size: 60))
                 .fontWeight(.bold)
                 .foregroundStyle(Color(red: 0.059, green: 0.573, blue: 0.710))
         }
