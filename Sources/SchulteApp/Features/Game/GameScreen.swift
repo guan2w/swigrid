@@ -42,16 +42,16 @@ struct GameScreen: View {
             VStack(spacing: 14) {
                 HStack {
                     VStack(alignment: .leading) {
-                        Text("Next Number")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                        Text("Next")
+                            .font(.system(size: 18))
+                            .foregroundStyle(Color(red: 0.22, green: 0.29, blue: 0.31))
                         Button {
                             viewModel.toggleNextHint()
                             hapticService.nextHintTap()
                         } label: {
                             Text(viewModel.state.nextNumber.map(String.init) ?? "-")
-                                .font(.custom("Eras-Demi-ITC", size: 44))
-                                .foregroundStyle(Color(red: 0.37, green: 0.24, blue: 0.14))
+                                .font(.custom("Eras-Demi-ITC", size: proxy.size.width / 9))
+                                .foregroundStyle(Color(red: 0.47, green: 0.33, blue: 0.28).opacity(0.4))
                         }
                         .buttonStyle(.borderless)
                         .disabled(viewModel.state.status != .ongoing)
@@ -61,12 +61,13 @@ struct GameScreen: View {
                     Spacer()
 
                     VStack(alignment: .trailing) {
-                        Text("Elapsed")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                        Text("Time")
+                            .font(.system(size: 18))
+                            .foregroundStyle(Color(red: 0.22, green: 0.29, blue: 0.31))
                         Text(formatSeconds(viewModel.state.elapsedMilliseconds))
-                            .font(.custom("digital-7", size: 44))
-                            .foregroundStyle(.yellow.opacity(0.9))
+                            .font(.custom("digital-7", size: proxy.size.width / 5.5))
+                            .foregroundStyle(Color(red: 0.976, green: 0.659, blue: 0.145))
+                            .shadow(color: Color(red: 0.976, green: 0.659, blue: 0.145), radius: 1)
                             .accessibilityIdentifier("game.timer")
                     }
                 }
@@ -82,8 +83,9 @@ struct GameScreen: View {
                         .overlay(alignment: .center) {
                             if viewModel.state.status == .ready {
                                 Text(viewModel.state.countdown > 0 ? "\(viewModel.state.countdown)" : "Go")
-                                    .font(.custom("CrashNumbering", size: min(gridSide * 0.34, 110)))
-                                    .foregroundStyle(.green.opacity(0.75))
+                                    .font(.custom("CrashNumbering", size: 150))
+                                    .foregroundStyle(.green.opacity(0.7))
+                                    .shadow(color: Color.black.opacity(0.13), radius: 4)
                             }
                         }
                 }
@@ -143,7 +145,7 @@ struct GameScreen: View {
         let scale = max(activeGridConfig.scale, 1)
         let columns = Array(repeating: GridItem(.flexible(), spacing: spacing), count: scale)
         let cellSize = max((side - CGFloat(scale - 1) * spacing) / CGFloat(scale), 44)
-        let fontSize = min(cellSize * 0.48, 30)
+        let fontSize = floor((side - 30) / CGFloat(scale) / 2)
 
         return LazyVGrid(columns: columns, spacing: 6) {
             ForEach(displayedNumbers.indices, id: \.self) { index in
@@ -155,7 +157,7 @@ struct GameScreen: View {
                 } label: {
                     ZStack {
                         RoundedRectangle(cornerRadius: 10)
-                            .fill(Color.gray.opacity(0.13))
+                            .fill(Color(white: 0.933))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 10)
                                     .stroke(isHighlighted ? Color.teal.opacity(0.9) : Color.clear, lineWidth: 3)
@@ -163,7 +165,7 @@ struct GameScreen: View {
 
                         Text(displayNumber.map(String.init) ?? "")
                             .font(.custom("Eras-Demi-ITC", size: fontSize))
-                            .foregroundStyle(Color(red: 0.26, green: 0.35, blue: 0.39))
+                            .foregroundStyle(Color(red: 0.216, green: 0.278, blue: 0.310).opacity(Double(scale + 9) / 20.0))
                     }
                     .frame(height: cellSize)
                     .scaleEffect(isHighlighted ? 1.04 : 1.0)

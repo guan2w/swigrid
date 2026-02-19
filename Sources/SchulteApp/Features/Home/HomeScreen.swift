@@ -58,12 +58,14 @@ struct HomeScreen: View {
 
     private var titleArea: some View {
         ZStack {
-            Color(red: 1.0, green: 0.93, blue: 0.82).opacity(0.6)
+            Color.orange.opacity(0.04)
             Text("Schulte Grid")
                 .font(.custom("Sanvito", size: 60))
-                .foregroundStyle(Color(red: 0.05, green: 0.34, blue: 0.49))
+                .fontWeight(.bold)
+                .foregroundStyle(Color(red: 0.059, green: 0.573, blue: 0.710))
         }
-        .frame(height: 110)
+        .frame(height: 120)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
     private func middleArea(screenWidth: CGFloat) -> some View {
@@ -101,7 +103,7 @@ struct HomeScreen: View {
         } label: {
             Image(systemName: viewModel.state.mute ? "speaker.slash.fill" : "speaker.wave.2.fill")
                 .font(.system(size: 22))
-                .foregroundStyle(Color(red: 0.05, green: 0.34, blue: 0.49))
+                .foregroundStyle(Color(red: 0.059, green: 0.573, blue: 0.710))
                 .frame(width: 44, height: 44)
         }
         .accessibilityIdentifier("home.audio.mute")
@@ -111,7 +113,7 @@ struct HomeScreen: View {
         Button { onAbout() } label: {
             Image(systemName: "info.circle")
                 .font(.system(size: 22))
-                .foregroundStyle(Color(red: 0.05, green: 0.34, blue: 0.49))
+                .foregroundStyle(Color(red: 0.059, green: 0.573, blue: 0.710))
                 .frame(width: 44, height: 44)
         }
         .accessibilityIdentifier("home.about")
@@ -134,7 +136,7 @@ struct HomeScreen: View {
         Button { onRecords(viewModel.state.gridConfig) } label: {
             Image(systemName: "list.bullet.rectangle")
                 .font(.system(size: 22))
-                .foregroundStyle(Color(red: 0.05, green: 0.34, blue: 0.49))
+                .foregroundStyle(Color(red: 0.059, green: 0.573, blue: 0.710))
                 .frame(width: 44, height: 44)
         }
         .accessibilityIdentifier("home.records")
@@ -154,15 +156,16 @@ struct HomeScreen: View {
             }
         } label: {
             Text("Start")
-                .font(.system(size: 30, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
+                .font(.system(size: 36))
+                .italic()
+                .foregroundStyle(Color(white: 0.26))
                 .frame(maxWidth: .infinity)
                 .frame(height: 52)
                 .background(
                     LinearGradient(
-                        colors: [Color(red: 0.1, green: 0.55, blue: 0.78), Color(red: 0.05, green: 0.40, blue: 0.65)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
+                        colors: [Color(red: 0.62, green: 0.86, blue: 0.95), Color(red: 0.36, green: 0.76, blue: 0.91)],
+                        startPoint: .bottomLeading,
+                        endPoint: .topTrailing
                     ),
                     in: RoundedRectangle(cornerRadius: 30)
                 )

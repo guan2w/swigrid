@@ -52,6 +52,7 @@ struct RecordsScreen: View {
             )
             .accessibilityIdentifier("records.grid.scale")
 
+            let contentFontSize = geo.size.width / 24
             if viewModel.state.records.isEmpty {
                 Text(emptyText)
                     .foregroundStyle(.secondary)
@@ -61,21 +62,27 @@ struct RecordsScreen: View {
                     ForEach(Array(viewModel.state.records.enumerated()), id: \.offset) { offset, record in
                         HStack {
                             Text("#\(offset + 1)")
-                                .frame(width: 42, alignment: .leading)
+                                .font(.system(size: contentFontSize))
+                                .foregroundStyle(Color(red: 0.271, green: 0.353, blue: 0.392))
+                                .frame(width: 42, alignment: .center)
 
                             Text(String(format: "%.2f", record.timeScoreAsSeconds))
-                                .font(.custom("digital-7", size: 26))
+                                .font(.custom("digital-7", size: contentFontSize * 1.3))
+                                .fontWeight(.bold)
+                                .foregroundStyle(Color(red: 0.976, green: 0.659, blue: 0.145))
                                 .frame(width: 78, alignment: .leading)
 
                             StarRowView(
                                 count: record.level,
                                 dual: record.gridConfig.dual,
                                 showColorful: record.isFresh(),
-                                size: 14
+                                size: contentFontSize * 1.5
                             )
                             .frame(width: 88, alignment: .leading)
 
                             Text(record.player.name)
+                                .font(.system(size: contentFontSize))
+                                .foregroundStyle(Color(red: 0.271, green: 0.353, blue: 0.392))
                                 .lineLimit(1)
                         }
                     }
