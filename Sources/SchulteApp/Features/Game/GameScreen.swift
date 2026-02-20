@@ -138,6 +138,9 @@ struct GameScreen: View {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button { dismiss() } label: {
                     Image(systemName: "chevron.backward")
+                        .font(.system(size: 18, weight: .semibold))
+                        .padding(12)
+                        .contentShape(Rectangle())
                 }
             }
         }
@@ -271,7 +274,6 @@ struct GameScreen: View {
         case .correct, .finished:
             audioService.play(.correct, muted: isMuted)
             hapticService.correctTap()
-            triggerFlash(at: index)
             withAnimation(.easeOut(duration: 0.15)) {
                 if let deferredSecondRoundNumbers {
                     if displayedNumbers[index] == deferredSecondRoundNumbers[index] {
