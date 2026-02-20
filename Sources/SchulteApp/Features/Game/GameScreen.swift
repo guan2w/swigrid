@@ -41,12 +41,21 @@ struct GameScreen: View {
     var body: some View {
         GeometryReader { proxy in
             let gridSide = max(220, min(proxy.size.width - 32, proxy.size.height * 0.72))
-            VStack(spacing: 14) {
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("Next")
-                            .font(.system(size: 18))
-                            .foregroundStyle(Color(red: 0.22, green: 0.29, blue: 0.31))
+            ZStack {
+                // Subtle static background gradient to match the clean glass aesthetic
+                LinearGradient(
+                    colors: [Color(uiColor: .systemBackground), Color(uiColor: .secondarySystemBackground)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
+
+                VStack(spacing: 14) {
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text("Next")
+                                .font(.system(size: 18, weight: .medium, design: .rounded))
+                                .foregroundStyle(Color.primary.opacity(0.6))
                         Button {
                             if let next = viewModel.state.nextNumber,
                                let idx = displayedNumbers.firstIndex(of: next) {
@@ -56,7 +65,8 @@ struct GameScreen: View {
                         } label: {
                             Text(viewModel.state.nextNumber.map(String.init) ?? "-")
                                 .font(.custom("ErasITC-Demi", size: proxy.size.width / 9))
-                                .foregroundStyle(Color(red: 0.47, green: 0.33, blue: 0.28).opacity(0.4))
+                                .foregroundStyle(Color.primary.opacity(0.85))
+                                .shadow(color: Color.white.opacity(0.5), radius: 6, x: 0, y: 0)
                         }
                         .buttonStyle(.borderless)
                         .disabled(viewModel.state.status != .ongoing)
@@ -67,8 +77,8 @@ struct GameScreen: View {
 
                     VStack(alignment: .trailing) {
                         Text("Time")
-                            .font(.system(size: 18))
-                            .foregroundStyle(Color(red: 0.22, green: 0.29, blue: 0.31))
+                            .font(.system(size: 18, weight: .medium, design: .rounded))
+                            .foregroundStyle(Color.primary.opacity(0.6))
                         Text(formatSeconds(viewModel.state.elapsedMilliseconds))
                             .font(.custom("Digital-7MonoItalic", size: proxy.size.width / 5.5))
                             .foregroundStyle(Color(red: 0.976, green: 0.659, blue: 0.145))
@@ -95,10 +105,23 @@ struct GameScreen: View {
                         }
                 }
 
-                Button("Restart Round") {
+                Button {
                     Task { await configureGame() }
+                } label: {
+                    Text("Restart Round")
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .foregroundStyle(Color.primary.opacity(0.85))
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 50)
+                        .background(.regularMaterial, in: Capsule())
+                        .overlay(
+                            Capsule()
+                                .stroke(Color.white.opacity(0.6), lineWidth: 1)
+                        )
+                        .shadow(color: .black.opacity(0.15), radius: 6, x: 0, y: 3)
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(PlainButtonStyle())
+                .padding(.horizontal, 36)
                 .disabled(!player.hasName)
                 .accessibilityIdentifier("game.restart")
 
@@ -106,6 +129,7 @@ struct GameScreen: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .padding(16)
+            } // End ZStack
         }
         .navigationTitle("Challenge")
         .navigationBarBackButtonHidden(true)
@@ -168,12 +192,17 @@ struct GameScreen: View {
                     handleCellTap(index: index)
                 } label: {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(isFlashing ? Color.teal.opacity(0.25) : Color(white: 0.933))
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(isFlashing ? Color.teal.opacity(0.4) : .clear)
+                            .background(isFlashing ? .regularMaterial : .ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(Color.white.opacity(0.5), lineWidth: 1))
+                            .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 2)
 
                         Text(displayNumber.map(String.init) ?? "")
                             .font(.custom("ErasITC-Demi", size: fontSize))
-                            .foregroundStyle(Color(red: 0.216, green: 0.278, blue: 0.310).opacity(Double(scale + 9) / 20.0))
+                            // Restored legacy opacity logic: older scale sizes have lighter text
+                            .foregroundStyle(Color.primary.opacity(Double(scale + 9) / 20.0))
+                            .shadow(color: Color.white.opacity(0.3), radius: 2, x: 0, y: 0)
                     }
                     .frame(height: cellSize)
                     .animation(.easeInOut(duration: 0.15), value: isFlashing)

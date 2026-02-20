@@ -33,15 +33,18 @@ struct HomeScreen: View {
     var body: some View {
         GeometryReader { geo in
             ZStack {
+                // Let the animated background be crisp
                 SplitGridBackgroundView()
-                    .overlay(Color.white.opacity(0.25))
+                    .overlay(Color(uiColor: .systemBackground).opacity(0.4))
+                    .ignoresSafeArea()
 
                 VStack(spacing: 0) {
                     titleArea
+                        .padding(.top, 40) // Pushes title down
                     middleArea(screenWidth: geo.size.width)
                     startButton
                         .padding(.horizontal, 36)
-                        .padding(.bottom, 20)
+                        .padding(.bottom, 60) // Pushes start button up
                 }
             }
         }
@@ -58,19 +61,21 @@ struct HomeScreen: View {
 
     private var titleArea: some View {
         ZStack {
-            Color.orange.opacity(0.04)
             Text("Schulte Grid")
-                .font(.custom("SanvitoPro-LtDisp", size: 60))
-                .fontWeight(.bold)
-                .foregroundStyle(Color(red: 0.059, green: 0.573, blue: 0.710))
+                // Use a modern rounded system font instead of the custom one for a cleaner look
+                .font(.system(size: 54, weight: .heavy, design: .rounded))
+                .foregroundStyle(Color.primary.opacity(0.85))
+                // Solid drop shadow to lift it off the patterned background
+                .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 4)
+                .shadow(color: Color.white.opacity(0.8), radius: 1, x: 0, y: -1)
         }
         .frame(height: 120)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
     private func middleArea(screenWidth: CGFloat) -> some View {
         VStack(spacing: 0) {
             Spacer()
+            
             HStack(spacing: 0) {
                 muteButton
                 Spacer()
@@ -79,7 +84,9 @@ struct HomeScreen: View {
                 aboutButton
             }
             .padding(.horizontal, 16)
+            
             Spacer()
+            
             StarRowView(
                 count: viewModel.state.starCount,
                 dual: viewModel.state.gridConfig.dual,
@@ -87,12 +94,15 @@ struct HomeScreen: View {
                 size: screenWidth / 11
             )
             .frame(height: screenWidth / 11)
+            
             Spacer()
+            
             HStack(spacing: 12) {
                 playerTextField
                 recordsButton
             }
             .padding(.horizontal, 20)
+            
             Spacer()
         }
     }
@@ -102,19 +112,25 @@ struct HomeScreen: View {
             Task { await viewModel.setMute(!viewModel.state.mute) }
         } label: {
             Image(systemName: viewModel.state.mute ? "speaker.slash.fill" : "speaker.wave.2.fill")
-                .font(.system(size: 22))
-                .foregroundStyle(Color(red: 0.059, green: 0.573, blue: 0.710))
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(Color.primary.opacity(0.7))
                 .frame(width: 44, height: 44)
+                .background(.regularMaterial, in: Circle())
+                .overlay(Circle().stroke(Color.white.opacity(0.6), lineWidth: 1))
+                .shadow(color: .black.opacity(0.15), radius: 6, x: 0, y: 3)
         }
         .accessibilityIdentifier("home.audio.mute")
     }
 
     private var aboutButton: some View {
         Button { onAbout() } label: {
-            Image(systemName: "info.circle")
-                .font(.system(size: 22))
-                .foregroundStyle(Color(red: 0.059, green: 0.573, blue: 0.710))
+            Image(systemName: "info")
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(Color.primary.opacity(0.7))
                 .frame(width: 44, height: 44)
+                .background(.regularMaterial, in: Circle())
+                .overlay(Circle().stroke(Color.white.opacity(0.6), lineWidth: 1))
+                .shadow(color: .black.opacity(0.15), radius: 6, x: 0, y: 3)
         }
         .accessibilityIdentifier("home.about")
     }
@@ -126,18 +142,28 @@ struct HomeScreen: View {
                     playerNameDraft = String(newValue.prefix(Player.maxNameLength))
                 }
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
-            .background(Color.white.opacity(0.85), in: RoundedRectangle(cornerRadius: 10))
+            .font(.system(.body, design: .rounded))
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(.regularMaterial, in: Capsule())
+            // Visible glass border edge
+            .overlay(
+                Capsule()
+                    .stroke(Color.white.opacity(0.6), lineWidth: 1)
+            )
+            .shadow(color: .black.opacity(0.15), radius: 6, x: 0, y: 3)
             .accessibilityIdentifier("home.player.textfield")
     }
 
     private var recordsButton: some View {
         Button { onRecords(viewModel.state.gridConfig) } label: {
-            Image(systemName: "list.bullet.rectangle")
-                .font(.system(size: 22))
-                .foregroundStyle(Color(red: 0.059, green: 0.573, blue: 0.710))
+            Image(systemName: "list.bullet")
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(Color.primary.opacity(0.7))
                 .frame(width: 44, height: 44)
+                .background(.regularMaterial, in: Circle())
+                .overlay(Circle().stroke(Color.white.opacity(0.6), lineWidth: 1))
+                .shadow(color: .black.opacity(0.15), radius: 6, x: 0, y: 3)
         }
         .accessibilityIdentifier("home.records")
     }
@@ -156,20 +182,19 @@ struct HomeScreen: View {
             }
         } label: {
             Text("Start")
-                .font(.system(size: 36))
-                .italic()
-                .foregroundStyle(Color(white: 0.26))
+                .font(.system(size: 32, weight: .bold, design: .rounded))
+                .foregroundStyle(Color.primary.opacity(0.85))
                 .frame(maxWidth: .infinity)
-                .frame(height: 52)
-                .background(
-                    LinearGradient(
-                        colors: [Color(red: 0.62, green: 0.86, blue: 0.95), Color(red: 0.36, green: 0.76, blue: 0.91)],
-                        startPoint: .bottomLeading,
-                        endPoint: .topTrailing
-                    ),
-                    in: RoundedRectangle(cornerRadius: 30)
+                .frame(height: 56)
+                .background(.regularMaterial, in: Capsule())
+                .overlay(
+                    Capsule()
+                        .stroke(Color.white.opacity(0.6), lineWidth: 1)
                 )
+                .shadow(color: .black.opacity(0.15), radius: 6, x: 0, y: 3)
         }
+        // Button press animation support
+        .buttonStyle(PlainButtonStyle())
         .accessibilityIdentifier("home.start")
     }
 
