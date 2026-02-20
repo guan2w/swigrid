@@ -104,6 +104,7 @@ struct GameScreen: View {
                             }
                         }
                 }
+                .padding(.bottom, 24)
 
                 Button {
                     Task { await configureGame() }
@@ -188,8 +189,9 @@ struct GameScreen: View {
             ForEach(displayedNumbers.indices, id: \.self) { index in
                 let displayNumber = displayedNumbers[index]
                 let isFlashing = (flashIndex == index)
+                let isVisible = (displayNumber != nil)
                 Button {
-                    handleCellTap(index: index)
+                    // Action handled by TouchDownButtonStyle for instant response
                 } label: {
                     ZStack {
                         RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -198,16 +200,22 @@ struct GameScreen: View {
                             .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(Color.white.opacity(0.5), lineWidth: 1))
                             .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 2)
 
+                        // For dynamic grids, animating scale/opacity of a persistent view
+                        // is far more reliable than inserting/removing it via .transition.
                         Text(displayNumber.map(String.init) ?? "")
                             .font(.custom("ErasITC-Demi", size: fontSize))
-                            // Restored legacy opacity logic: older scale sizes have lighter text
                             .foregroundStyle(Color.primary.opacity(Double(scale + 9) / 20.0))
                             .shadow(color: Color.white.opacity(0.3), radius: 2, x: 0, y: 0)
+                            .scaleEffect(isVisible ? 1.0 : 0.1)
+                            .opacity(isVisible ? 1.0 : 0)
+                            .animation(.easeOut(duration: 0.18), value: isVisible)
                     }
                     .frame(height: cellSize)
                     .animation(.easeInOut(duration: 0.15), value: isFlashing)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(TouchDownButtonStyle {
+                    handleCellTap(index: index)
+                })
                 .disabled(displayNumber == nil || viewModel.state.status != .ongoing)
                 .accessibilityIdentifier("game.cell.\(index)")
             }
@@ -305,5 +313,22 @@ struct GameScreen: View {
 
     private func formatSeconds(_ milliseconds: Int64) -> String {
         String(format: "%.2f", ScoringRule.millisecondsToSeconds(milliseconds))
+    }
+}
+
+fileprivate struct TouchDownButtonStyle: ButtonStyle {
+    let action: () -> Void
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .onChange(of: configuration.isPressed) { _, isPressed in
+                if isPressed {
+                    // Dispatch to next run loop to decouple from the gesture state update
+                    // This allows `withAnimation` inside the action to properly trigger `.transition`
+                    DispatchQueue.main.async {
+                        action()
+                    }
+                }
+            }
     }
 }
