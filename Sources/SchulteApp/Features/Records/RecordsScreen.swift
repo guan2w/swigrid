@@ -60,10 +60,10 @@ struct RecordsScreen: View {
             } else {
                 List {
                     ForEach(Array(viewModel.state.records.enumerated()), id: \.offset) { offset, record in
-                        HStack {
+                        HStack(spacing: 8) {
                             Text("#\(offset + 1)")
                                 .font(.system(size: contentFontSize))
-                                .foregroundStyle(Color(red: 0.271, green: 0.353, blue: 0.392))
+                                .foregroundStyle(.secondary)
                                 .frame(width: 42, alignment: .center)
 
                             Text(String(format: "%.2f", record.timeScoreAsSeconds))
@@ -78,7 +78,7 @@ struct RecordsScreen: View {
                                 showColorful: record.isFresh(),
                                 size: contentFontSize * 1.5
                             )
-                            .frame(width: 88, alignment: .leading)
+                            .frame(width: 110, alignment: .leading)
 
                             Text(record.player.name)
                                 .font(.system(size: contentFontSize))

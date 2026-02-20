@@ -108,6 +108,14 @@ struct GameScreen: View {
             .padding(16)
         }
         .navigationTitle("Challenge")
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button { dismiss() } label: {
+                    Image(systemName: "chevron.backward")
+                }
+            }
+        }
         .task {
             await configureGame()
         }
