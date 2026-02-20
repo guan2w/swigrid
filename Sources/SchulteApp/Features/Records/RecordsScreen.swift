@@ -64,13 +64,13 @@ struct RecordsScreen: View {
                             Text("#\(offset + 1)")
                                 .font(.system(size: contentFontSize))
                                 .foregroundStyle(.secondary)
-                                .frame(width: 42, alignment: .center)
+                                .frame(width: contentFontSize * 2.5, alignment: .center)
 
                             Text(String(format: "%.2f", record.timeScoreAsSeconds))
                                 .font(.custom("Digital-7MonoItalic", size: contentFontSize * 1.3))
                                 .fontWeight(.bold)
                                 .foregroundStyle(Color(red: 0.976, green: 0.659, blue: 0.145))
-                                .frame(width: 78, alignment: .leading)
+                                .frame(width: contentFontSize * 4.5, alignment: .leading)
 
                             StarRowView(
                                 count: record.level,
@@ -78,12 +78,13 @@ struct RecordsScreen: View {
                                 showColorful: record.isFresh(),
                                 size: contentFontSize * 1.5
                             )
-                            .frame(width: 110, alignment: .leading)
+                            .frame(width: contentFontSize * 11.5, alignment: .leading)
 
                             Text(record.player.name)
                                 .font(.system(size: contentFontSize))
                                 .foregroundStyle(Color(red: 0.271, green: 0.353, blue: 0.392))
                                 .lineLimit(1)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
                 }
