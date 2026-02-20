@@ -11,6 +11,7 @@ struct HomeScreen: View {
 
     @State private var playerNameDraft = ""
     @State private var showsPlayerNameRequiredAlert = false
+    @State private var starDragOffset: CGFloat = 0
 
     init(
         dependency: AppDependency,
@@ -93,7 +94,41 @@ struct HomeScreen: View {
                 showColorful: viewModel.state.showsFreshFiveStarBadge,
                 size: screenWidth / 11
             )
+            // 固定高度，并撑满宽度，确保星星为 0 时触控区域依然存在
             .frame(height: screenWidth / 11)
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
+            .offset(x: starDragOffset)
+            .animation(.interactiveSpring(response: 0.25, dampingFraction: 0.65), value: starDragOffset)
+            .onTapGesture {
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
+                    dualBinding.wrappedValue.toggle()
+                }
+            }
+            .gesture(
+                DragGesture(minimumDistance: 12, coordinateSpace: .local)
+                    .onChanged { value in
+                        // 橡皮筋反馈，系数 0.2 给轻微位移感
+                        starDragOffset = value.translation.width * 0.2
+                    }
+                    .onEnded { value in
+                        let threshold: CGFloat = 40
+                        let scales = GridConfig.allowedScales
+                        let current = scaleBinding.wrappedValue
+                        withAnimation(.spring(response: 0.4, dampingFraction: 0.72)) {
+                            if value.translation.width < -threshold,
+                               let idx = scales.firstIndex(of: current),
+                               idx + 1 < scales.count {
+                                scaleBinding.wrappedValue = scales[idx + 1]
+                            } else if value.translation.width > threshold,
+                                      let idx = scales.firstIndex(of: current),
+                                      idx - 1 >= 0 {
+                                scaleBinding.wrappedValue = scales[idx - 1]
+                            }
+                            starDragOffset = 0
+                        }
+                    }
+            )
             
             Spacer()
             

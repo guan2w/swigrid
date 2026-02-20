@@ -14,8 +14,16 @@ struct StarRowView: View {
                 Image(systemName: dual ? "star.fill" : "star")
                     .font(.system(size: size))
                     .foregroundStyle(starColor)
+                    // 每颗星单独进出场动画
+                    .transition(.asymmetric(
+                        insertion: .scale(scale: 0.3).combined(with: .opacity),
+                        removal:   .scale(scale: 0.3).combined(with: .opacity)
+                    ))
             }
         }
+        // count 或 dual 变化时触发弹性过渡
+        .animation(.spring(response: 0.38, dampingFraction: 0.68), value: count)
+        .animation(.spring(response: 0.35, dampingFraction: 0.7), value: dual)
         .onAppear {
             guard showColorful, count == 5 else {
                 return
