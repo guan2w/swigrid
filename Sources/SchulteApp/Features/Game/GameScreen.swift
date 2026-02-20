@@ -42,13 +42,11 @@ struct GameScreen: View {
         GeometryReader { proxy in
             let gridSide = max(220, min(proxy.size.width - 32, proxy.size.height * 0.72))
             ZStack {
-                // Subtle static background gradient to match the clean glass aesthetic
-                LinearGradient(
-                    colors: [Color(uiColor: .systemBackground), Color(uiColor: .secondarySystemBackground)],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
+                // Randomised coloured tile background – re‑generated each time the
+                // game screen appears, giving every session a fresh look.
+                GameGridBackgroundView()
+                    .overlay(Color(uiColor: .systemBackground).opacity(0.55))
+                    .ignoresSafeArea()
 
                 VStack(spacing: 14) {
                     HStack {
