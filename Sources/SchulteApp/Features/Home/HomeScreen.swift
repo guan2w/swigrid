@@ -76,7 +76,7 @@ struct HomeScreen: View {
     private func middleArea(screenWidth: CGFloat) -> some View {
         VStack(spacing: 0) {
             Spacer()
-            
+
             HStack(spacing: 0) {
                 muteButton
                 Spacer()
@@ -85,9 +85,9 @@ struct HomeScreen: View {
                 aboutButton
             }
             .padding(.horizontal, 16)
-            
+
             Spacer()
-            
+
             StarRowView(
                 count: viewModel.state.starCount,
                 dual: viewModel.state.gridConfig.dual,
@@ -100,46 +100,57 @@ struct HomeScreen: View {
             .contentShape(Rectangle())
             .offset(x: starDragOffset)
             .animation(.interactiveSpring(response: 0.25, dampingFraction: 0.65), value: starDragOffset)
-            .onTapGesture {
-                withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
-                    dualBinding.wrappedValue.toggle()
-                }
-            }
-            .gesture(
-                DragGesture(minimumDistance: 12, coordinateSpace: .local)
-                    .onChanged { value in
-                        // 橡皮筋反馈，系数 0.2 给轻微位移感
-                        starDragOffset = value.translation.width * 0.2
-                    }
-                    .onEnded { value in
-                        let threshold: CGFloat = 40
-                        let scales = GridConfig.allowedScales
-                        let current = scaleBinding.wrappedValue
-                        withAnimation(.spring(response: 0.4, dampingFraction: 0.72)) {
-                            if value.translation.width < -threshold,
-                               let idx = scales.firstIndex(of: current),
-                               idx + 1 < scales.count {
-                                scaleBinding.wrappedValue = scales[idx + 1]
-                            } else if value.translation.width > threshold,
-                                      let idx = scales.firstIndex(of: current),
-                                      idx - 1 >= 0 {
-                                scaleBinding.wrappedValue = scales[idx - 1]
-                            }
-                            starDragOffset = 0
-                        }
-                    }
-            )
-            
+            // 点击手势保留在星星行自身，以便与 VStack 层形成互补
+            .onTapGesture { performToggleDual() }
+
             Spacer()
-            
+
             HStack(spacing: 12) {
                 playerTextField
                 recordsButton
             }
             .padding(.horizontal, 20)
-            
+
             Spacer()
         }
+        // ─── 以下三行是本次改动的全部内容，布局完全不变 ───
+        // 让 VStack 整体（含 Spacer 空白区域）成为可命中区域
+        .contentShape(Rectangle())
+        // 点击 Spacer 空白区时触发（点击 Button/TextField 由子视图消费，不会冒泡到此）
+        .onTapGesture { performToggleDual() }
+        // 滑动在中间区域任意位置触发，simultaneousGesture 不阻断子视图手势
+        .simultaneousGesture(swipeGesture)
+    }
+
+    private func performToggleDual() {
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
+            dualBinding.wrappedValue.toggle()
+        }
+    }
+
+    private var swipeGesture: some Gesture {
+        DragGesture(minimumDistance: 12, coordinateSpace: .local)
+            .onChanged { value in
+                // 橡皮筋反馈，系数 0.2 给轻微位移感
+                starDragOffset = value.translation.width * 0.2
+            }
+            .onEnded { value in
+                let threshold: CGFloat = 40
+                let scales = GridConfig.allowedScales
+                let current = scaleBinding.wrappedValue
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.72)) {
+                    if value.translation.width < -threshold,
+                       let idx = scales.firstIndex(of: current),
+                       idx + 1 < scales.count {
+                        scaleBinding.wrappedValue = scales[idx + 1]
+                    } else if value.translation.width > threshold,
+                              let idx = scales.firstIndex(of: current),
+                              idx - 1 >= 0 {
+                        scaleBinding.wrappedValue = scales[idx - 1]
+                    }
+                    starDragOffset = 0
+                }
+            }
     }
 
     private var muteButton: some View {
