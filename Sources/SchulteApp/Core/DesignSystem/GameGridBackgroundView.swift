@@ -187,7 +187,7 @@ struct GameGridBackgroundView: View {
 #Preview {
     ZStack {
         GameGridBackgroundView()
-            .overlay(Color(uiColor: .systemBackground).opacity(0.55))
+            .overlay(Color.systemBackground.opacity(0.55))
         Text("Challenge")
             .font(.system(size: 34, weight: .heavy, design: .rounded))
             .foregroundStyle(Color.primary)

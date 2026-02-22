@@ -18,13 +18,10 @@ struct AboutScreen: View {
             .pickerStyle(.segmented)
 
             ScrollView {
-                Group {
-                    if let markdown = try? AttributedString(markdown: tab == 0 ? helpMarkdown : changelogMarkdown) {
-                        Text(markdown)
-                    } else {
-                        Text(tab == 0 ? helpMarkdown : changelogMarkdown)
-                    }
-                }
+                _SizingMarkdownView(
+                    markdown: tab == 0 ? helpMarkdown : changelogMarkdown,
+                    width: 0   // will be resolved by sizeThatFits
+                )
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
 

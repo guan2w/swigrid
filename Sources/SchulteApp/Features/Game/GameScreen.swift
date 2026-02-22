@@ -45,7 +45,7 @@ struct GameScreen: View {
                 // Randomised coloured tile background – re‑generated each time the
                 // game screen appears, giving every session a fresh look.
                 GameGridBackgroundView()
-                    .overlay(Color(uiColor: .systemBackground).opacity(0.55))
+                    .overlay(Color.systemBackground.opacity(0.55))
                     .ignoresSafeArea()
 
                 VStack(spacing: 14) {
@@ -99,7 +99,7 @@ struct GameScreen: View {
                 .overlay {
                     if viewModel.state.status == .ready {
                         RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .fill(Color(uiColor: .systemBackground).opacity(0.35))
+                            .fill(Color.systemBackground.opacity(0.35))
                             .allowsHitTesting(false)
                     }
                 }

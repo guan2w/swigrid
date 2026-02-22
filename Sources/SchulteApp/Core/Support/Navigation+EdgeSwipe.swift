@@ -5,6 +5,7 @@ extension View {
     /// the standard left-edge `interactivePopGestureRecognizer`.
     func edgeOnlySwipeBack() -> some View {
         onAppear {
+            #if canImport(UIKit)
             guard #available(iOS 18, *) else { return }
             DispatchQueue.main.async {
                 UIApplication.shared.connectedScenes
@@ -15,10 +16,12 @@ extension View {
                     .first?
                     .interactiveContentPopGestureRecognizer?.isEnabled = false
             }
+            #endif
         }
     }
 }
 
+#if canImport(UIKit)
 private func findNavController(in vc: UIViewController) -> UINavigationController? {
     if let nav = vc as? UINavigationController { return nav }
     for child in vc.children {
@@ -29,3 +32,4 @@ private func findNavController(in vc: UIViewController) -> UINavigationControlle
     }
     return nil
 }
+#endif

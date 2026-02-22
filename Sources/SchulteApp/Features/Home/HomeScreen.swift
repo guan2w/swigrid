@@ -36,7 +36,7 @@ struct HomeScreen: View {
             ZStack {
                 // Let the animated background be crisp
                 SplitGridBackgroundView()
-                    .overlay(Color(uiColor: .systemBackground).opacity(0.4))
+                    .overlay(Color.systemBackground.opacity(0.4))
                     .ignoresSafeArea()
 
                 VStack(spacing: 0) {
