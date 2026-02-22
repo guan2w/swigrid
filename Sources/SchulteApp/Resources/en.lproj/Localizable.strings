@@ -1,0 +1,43 @@
+/* Home Screen */
+"Swigrid" = "Swigrid";
+"Player Name Required" = "Player Name Required";
+"Please enter your name to start playing." = "Please enter your name to start playing.";
+"OK" = "OK";
+"Player name..." = "Player name...";
+"Play" = "Play";
+
+/* Game Screen */
+"Next" = "Next";
+"Time" = "Time";
+"Please enter your name on the Home screen to start." = "Please enter your name on the Home screen to start.";
+"Restart Game" = "Restart Game";
+"Unable to Continue" = "Unable to Continue";
+"Level Complete" = "Level Complete";
+"Home" = "Home";
+"Play Again" = "Play Again";
+"GO!" = "GO!";
+
+/* Records Screen */
+"Category" = "Category";
+"Personal" = "Personal";
+"Global" = "Global";
+"Today" = "Today";
+"Leaderboard" = "Leaderboard";
+"Reload" = "Reload";
+"No records yet..." = "No records yet...";
+"Coming in a future update!" = "Coming in a future update!";
+
+/* About Screen */
+"Content" = "Content";
+"How to Play" = "How to Play";
+"What's New" = "What's New";
+"About" = "About";
+"Train your focus and visual scanning skills with a fluid native iOS experience." = "Train your focus and visual scanning skills with a fluid native iOS experience.";
+
+"Failed to load game setup: %@" = "Failed to load game setup: %@";
+"Failed to save the result: %@" = "Failed to save the result: %@";
+
+
+"Help content is unavailable." = "Help content is unavailable.";
+"No changelog entries." = "No changelog entries.";
+

@@ -1,0 +1,40 @@
+/* Home Screen */
+"Swigrid" = "Swigrid";
+"Player Name Required" = "请输入昵称";
+"Please enter your name to start playing." = "请先输入您的昵称再开始游戏。";
+"OK" = "好的";
+"Player name..." = "你的名字...";
+"Play" = "开始挑战";
+
+/* Game Screen */
+"Next" = "下一个";
+"Time" = "时间";
+"Please enter your name on the Home screen to start." = "请先在主页输入您的昵称后再开始游戏。";
+"Restart Game" = "重新开始";
+"Unable to Continue" = "无法继续";
+"Level Complete" = "挑战完成";
+"Home" = "返回主页";
+"Play Again" = "再来一局";
+"GO!" = "开始！";
+
+/* Records Screen */
+"Category" = "分类";
+"Personal" = "个人";
+"Global" = "全球";
+"Today" = "今日";
+"Leaderboard" = "排行榜";
+"Reload" = "刷新";
+"No records yet..." = "暂无记录...";
+"Coming in a future update!" = "敬请期待后续更新！";
+
+/* About Screen */
+"Content" = "内容";
+"How to Play" = "玩法说明";
+"What's New" = "更新详情";
+"About" = "关于";
+"Train your focus and visual scanning skills with a fluid native iOS experience." = "在丝滑流畅的原生体验中，提升你的专注力与视觉搜索能力。";
+
+"Failed to load game setup: %@" = "游戏加载失败: %@";
+"Failed to save the result: %@" = "成绩保存失败: %@";
+"Help content is unavailable." = "说明内容暂时无法加载。";
+"No changelog entries." = "暂无更新日志。";
