@@ -6,7 +6,6 @@ let package = Package(
     name: "SchulteGridNative",
     platforms: [
         .iOS(.v26),
-        .macOS(.v15),
     ],
     products: [
         .library(
