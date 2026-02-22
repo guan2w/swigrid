@@ -22,13 +22,13 @@ struct RecordsScreen: View {
     var body: some View {
         GeometryReader { geo in
         VStack(spacing: 12) {
-            Picker("Category", selection: Binding(
+            Picker(L10n.text("Category"), selection: Binding(
                 get: { viewModel.state.selectedType },
                 set: { viewModel.selectType($0) }
             )) {
-                Text("Personal").tag(RecordsType.mine)
-                Text("Global").tag(RecordsType.global)
-                Text("Today").tag(RecordsType.today)
+                Text(L10n.text("Personal")).tag(RecordsType.mine)
+                Text(L10n.text("Global")).tag(RecordsType.global)
+                Text(L10n.text("Today")).tag(RecordsType.today)
             }
             .pickerStyle(.segmented)
             .accessibilityIdentifier("records.type")
@@ -107,10 +107,10 @@ struct RecordsScreen: View {
         }
         .frame(maxWidth: 720)
         .padding(16)
-        .navigationTitle("Leaderboard")
+        .navigationTitle(L10n.text("Leaderboard"))
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Button("Reload") {
+                Button(L10n.text("Reload")) {
                     Task { await viewModel.refresh() }
                 }
                 .accessibilityIdentifier("records.refresh")
@@ -154,9 +154,9 @@ struct RecordsScreen: View {
     private var emptyText: String {
         switch viewModel.state.selectedType {
         case .mine:
-            "No records yet..."
+            L10n.text("No records yet...")
         case .global, .today:
-            "Coming in a future update!"
+            L10n.text("Coming in a future update!")
         }
     }
 

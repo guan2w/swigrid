@@ -53,10 +53,10 @@ struct HomeScreen: View {
             await viewModel.load()
             playerNameDraft = viewModel.state.playerName
         }
-        .alert("Player Name Required", isPresented: $showsPlayerNameRequiredAlert) {
-            Button("OK", role: .cancel) {}
+        .alert(L10n.text("Player Name Required"), isPresented: $showsPlayerNameRequiredAlert) {
+            Button(L10n.text("OK"), role: .cancel) {}
         } message: {
-            Text("Please enter your name to start playing.")
+            Text(L10n.text("Please enter your name to start playing."))
         }
     }
 
@@ -182,7 +182,7 @@ struct HomeScreen: View {
     }
 
     private var playerTextField: some View {
-        TextField("Player name...", text: $playerNameDraft)
+        TextField(L10n.text("Player name..."), text: $playerNameDraft)
             .onChange(of: playerNameDraft) { _, newValue in
                 if newValue.count > Player.maxNameLength {
                     playerNameDraft = String(newValue.prefix(Player.maxNameLength))
@@ -227,7 +227,7 @@ struct HomeScreen: View {
                 }
             }
         } label: {
-            Text("Play")
+            Text(L10n.text("Play"))
                 .font(.system(size: 32, weight: .bold, design: .rounded))
                 .foregroundStyle(Color.primary.opacity(0.85))
                 .frame(maxWidth: .infinity)

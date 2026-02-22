@@ -51,6 +51,8 @@ let package = Package(
                 .copy("Resources/font"),
                 .copy("Resources/md"),
                 .copy("Resources/icon"),
+                .process("Resources/en.lproj"),
+                .process("Resources/zh-Hans.lproj"),
             ]
         ),
         .executableTarget(

@@ -51,7 +51,7 @@ struct GameScreen: View {
                 VStack(spacing: 14) {
                     HStack {
                         VStack(alignment: .leading) {
-                            Text("Next")
+                            Text(L10n.text("Next"))
                                 .font(.system(size: 18, weight: .medium, design: .rounded))
                                 .foregroundStyle(Color.primary.opacity(0.6))
                         Button {
@@ -74,7 +74,7 @@ struct GameScreen: View {
                     Spacer()
 
                     VStack(alignment: .trailing) {
-                        Text("Time")
+                        Text(L10n.text("Time"))
                             .font(.system(size: 18, weight: .medium, design: .rounded))
                             .foregroundStyle(Color.primary.opacity(0.6))
                         Text(formatSeconds(viewModel.state.elapsedMilliseconds))
@@ -86,7 +86,7 @@ struct GameScreen: View {
                 }
 
                 if !player.hasName {
-                    Text("Please enter your name on the Home screen to start.")
+                    Text(L10n.text("Please enter your name on the Home screen to start."))
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
@@ -113,7 +113,7 @@ struct GameScreen: View {
                 Button {
                     Task { await configureGame() }
                 } label: {
-                    Text("Restart Game")
+                    Text(L10n.text("Restart Game"))
                         .font(.system(size: 20, weight: .bold, design: .rounded))
                         .foregroundStyle(Color.primary.opacity(0.85))
                         .frame(maxWidth: .infinity)
@@ -136,7 +136,7 @@ struct GameScreen: View {
             .padding(16)
             } // End ZStack
         }
-        .navigationTitle("Swigrid")
+        .navigationTitle(L10n.text("Swigrid"))
         .edgeOnlySwipeBack()
         .task {
             await configureGame()
@@ -184,11 +184,11 @@ struct GameScreen: View {
                 .animation(.spring(response: 0.4, dampingFraction: 0.8), value: showsResultAlert)
             }
         }
-        .alert("Unable to Continue", isPresented: Binding(
+        .alert(L10n.text("Unable to Continue"), isPresented: Binding(
             get: { errorMessage != nil },
             set: { if !$0 { errorMessage = nil } }
         )) {
-            Button("OK", role: .cancel) { errorMessage = nil }
+            Button(L10n.text("OK"), role: .cancel) { errorMessage = nil }
         } message: {
             Text(errorMessage ?? "")
         }
@@ -268,7 +268,7 @@ struct GameScreen: View {
             didSaveResult = false
             showsResultAlert = false
         } catch {
-            errorMessage = "Failed to load game setup: \(error.localizedDescription)"
+            errorMessage = L10n.format("Failed to load game setup: %@", error.localizedDescription)
         }
     }
 
@@ -316,7 +316,7 @@ struct GameScreen: View {
             resultLevel = record.level
             showsResultAlert = true
         } catch {
-            errorMessage = "Failed to save the result: \(error.localizedDescription)"
+            errorMessage = L10n.format("Failed to save the result: %@", error.localizedDescription)
         }
     }
 
@@ -359,7 +359,7 @@ fileprivate struct ResultOverlayView: View {
 
                 VStack(spacing: 28) {
                     // ── Title ──────────────────────────────────────
-                    Text("Level Complete")
+                    Text(L10n.text("Level Complete"))
                         .font(.system(size: 26, weight: .bold, design: .rounded))
                         .foregroundStyle(Color(white: 0.12))
 
@@ -375,7 +375,7 @@ fileprivate struct ResultOverlayView: View {
 
                     // ── Time ───────────────────────────────────────
                     VStack(spacing: 2) {
-                        Text("Time")
+                        Text(L10n.text("Time"))
                             .font(.system(size: 13, weight: .semibold, design: .rounded))
                             .foregroundStyle(Color(white: 0.35))
                             .tracking(1.5)
@@ -393,7 +393,7 @@ fileprivate struct ResultOverlayView: View {
                             HStack(spacing: 6) {
                                 Image(systemName: "house")
                                     .font(.system(size: 15, weight: .semibold))
-                                Text("Home")
+                                Text(L10n.text("Home"))
                                     .font(.system(size: 17, weight: .semibold, design: .rounded))
                             }
                             .foregroundStyle(Color(white: 0.2))
@@ -410,7 +410,7 @@ fileprivate struct ResultOverlayView: View {
                             HStack(spacing: 6) {
                                 Image(systemName: "arrow.clockwise")
                                     .font(.system(size: 15, weight: .semibold))
-                                Text("Play Again")
+                                Text(L10n.text("Play Again"))
                                     .font(.system(size: 17, weight: .semibold, design: .rounded))
                             }
                             .foregroundStyle(.white)
@@ -500,7 +500,7 @@ fileprivate struct RacingLightsOverlayView: View {
                 }
             }
             if burstProgress > 0.4 {
-                Text("GO!")
+                Text(L10n.text("GO!"))
                     .font(.system(size: 18, weight: .semibold, design: .rounded))
                     .foregroundStyle(Color.primary.opacity(0.7))
                     .transition(.scale(scale: 0.5).combined(with: .opacity))

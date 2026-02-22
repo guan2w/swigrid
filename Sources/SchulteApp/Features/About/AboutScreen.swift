@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct AboutScreen: View {
+    @Environment(\.locale) private var locale
     @State private var tab = 0
 
     var body: some View {
@@ -8,12 +9,12 @@ struct AboutScreen: View {
             Text("Swigrid")
                 .font(.system(size: 36, weight: .bold, design: .serif))
 
-            Text("Train your focus and visual scanning skills with a fluid native iOS experience.")
+            Text(L10n.text("Train your focus and visual scanning skills with a fluid native iOS experience."))
                 .foregroundStyle(.secondary)
 
-            Picker("Content", selection: $tab) {
-                Text("How to Play").tag(0)
-                Text("What's New").tag(1)
+            Picker(L10n.text("Content"), selection: $tab) {
+                Text(L10n.text("How to Play")).tag(0)
+                Text(L10n.text("What's New")).tag(1)
             }
             .pickerStyle(.segmented)
 
@@ -28,16 +29,47 @@ struct AboutScreen: View {
             Spacer()
         }
         .padding(20)
-        .navigationTitle("About")
+        .navigationTitle(L10n.text("About"))
         .edgeOnlySwipeBack()
     }
 
     private var helpMarkdown: String {
-        loadMarkdown(named: "help.md") ?? "Help content is unavailable."
+        loadLocalizedMarkdown(baseName: "help") ?? L10n.text("Help content is unavailable.")
     }
 
     private var changelogMarkdown: String {
-        loadMarkdown(named: "changelog.md") ?? "No changelog entries."
+        loadLocalizedMarkdown(baseName: "changelog") ?? L10n.text("No changelog entries.")
+    }
+
+    private func loadLocalizedMarkdown(baseName: String) -> String? {
+        for filename in preferredMarkdownFilenames(baseName: baseName) {
+            if let markdown = loadMarkdown(named: filename) {
+                return markdown
+            }
+        }
+        return nil
+    }
+
+    private func preferredMarkdownFilenames(baseName: String) -> [String] {
+        if prefersChineseMarkdown {
+            return ["\(baseName)_zh.md", "\(baseName).md"]
+        }
+        return ["\(baseName).md"]
+    }
+
+    private var prefersChineseMarkdown: Bool {
+        let modulePreferredLocalization = Bundle.module.preferredLocalizations.first?.lowercased() ?? ""
+        if modulePreferredLocalization.hasPrefix("zh") {
+            return true
+        }
+
+        if locale.identifier.lowercased().hasPrefix("zh") {
+            return true
+        }
+
+        return Locale.preferredLanguages.contains { language in
+            language.lowercased().hasPrefix("zh")
+        }
     }
 
     private func loadMarkdown(named filename: String) -> String? {
