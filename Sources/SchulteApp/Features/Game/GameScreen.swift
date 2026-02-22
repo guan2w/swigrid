@@ -86,7 +86,7 @@ struct GameScreen: View {
                 }
 
                 if !player.hasName {
-                    Text("Set a player name on Home before starting.")
+                    Text("Please enter your name on the Home screen to start.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
@@ -113,7 +113,7 @@ struct GameScreen: View {
                 Button {
                     Task { await configureGame() }
                 } label: {
-                    Text("Restart Round")
+                    Text("Restart Game")
                         .font(.system(size: 20, weight: .bold, design: .rounded))
                         .foregroundStyle(Color.primary.opacity(0.85))
                         .frame(maxWidth: .infinity)
@@ -136,7 +136,7 @@ struct GameScreen: View {
             .padding(16)
             } // End ZStack
         }
-        .navigationTitle("Challenge")
+        .navigationTitle("Swigrid")
         .edgeOnlySwipeBack()
         .task {
             await configureGame()
@@ -359,7 +359,7 @@ fileprivate struct ResultOverlayView: View {
 
                 VStack(spacing: 28) {
                     // ── Title ──────────────────────────────────────
-                    Text("Round Complete")
+                    Text("Level Complete")
                         .font(.system(size: 26, weight: .bold, design: .rounded))
                         .foregroundStyle(Color(white: 0.12))
 
@@ -405,12 +405,12 @@ fileprivate struct ResultOverlayView: View {
                         }
                         .buttonStyle(PlainButtonStyle())
 
-                        // New Game
+                        // Play Again
                         Button(action: onNewGame) {
                             HStack(spacing: 6) {
                                 Image(systemName: "arrow.clockwise")
                                     .font(.system(size: 15, weight: .semibold))
-                                Text("New Game")
+                                Text("Play Again")
                                     .font(.system(size: 17, weight: .semibold, design: .rounded))
                             }
                             .foregroundStyle(.white)

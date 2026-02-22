@@ -1,6 +1,5 @@
-> Tap numbers from 1 to the highest value as quickly as you can.
+> Tap the numbers in ascending order, starting from 1. Let's see how fast you can go!
 
-
-### The grid switcher (`3 × 3`)
-- Swipe to change the grid size.
-- Toggle `Dual Mode` to play a second round in one run.
+### Controls
+- **Change Grid Size**: Swipe left or right in the middle area to adjust the difficulty.
+- **Dual Mode**: Tap anywhere in the middle area to toggle dual mode and play two rounds back-to-back.

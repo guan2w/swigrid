@@ -1,18 +1,9 @@
-## Changelog
-
+## Release Notes
 
 ### v1.0.0
-- Delivered the core gameplay experience
-    - Game
-        - Grid size options
-        - Sound toggle
-        - Timer display
-        - _Next Number_ hint
-        - Player name setup
-    - Records
-        - Local persistence and secure storage
-    - 5-star highlight
-        - Stays active for 24 hours
-    - Animated split-grid background
-    - About page
-    - Help page
+- **Welcome to Swigrid!** The core speed-tapping experience is now live.
+- Swipe the middle area to change grid sizes and adjust the difficulty.
+- Tap anywhere in the middle area to enable **Dual Mode** for consecutive rounds.
+- Sound and haptic feedback to guide your taps.
+- View your **Personal Best** on the Leaderboard securely.
+- Achieve a 5-star rating to keep your stars bright for 24 hours.

@@ -56,13 +56,13 @@ struct HomeScreen: View {
         .alert("Player Name Required", isPresented: $showsPlayerNameRequiredAlert) {
             Button("OK", role: .cancel) {}
         } message: {
-            Text("Please enter a player name before starting.")
+            Text("Please enter your name to start playing.")
         }
     }
 
     private var titleArea: some View {
         ZStack {
-            Text("Schulte Grid")
+            Text("Swigrid")
                 // Use a modern rounded system font instead of the custom one for a cleaner look
                 .font(.system(size: 54, weight: .heavy, design: .rounded))
                 .foregroundStyle(Color.primary.opacity(0.85))
@@ -182,7 +182,7 @@ struct HomeScreen: View {
     }
 
     private var playerTextField: some View {
-        TextField("Enter your name", text: $playerNameDraft)
+        TextField("Player name...", text: $playerNameDraft)
             .onChange(of: playerNameDraft) { _, newValue in
                 if newValue.count > Player.maxNameLength {
                     playerNameDraft = String(newValue.prefix(Player.maxNameLength))
@@ -227,7 +227,7 @@ struct HomeScreen: View {
                 }
             }
         } label: {
-            Text("Start")
+            Text("Play")
                 .font(.system(size: 32, weight: .bold, design: .rounded))
                 .foregroundStyle(Color.primary.opacity(0.85))
                 .frame(maxWidth: .infinity)

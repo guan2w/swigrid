@@ -5,15 +5,15 @@ struct AboutScreen: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Schulte Grid")
+            Text("Swigrid")
                 .font(.system(size: 36, weight: .bold, design: .serif))
 
-            Text("A focus and visual scanning game, rebuilt with native iOS interactions.")
+            Text("Train your focus and visual scanning skills with a fluid native iOS experience.")
                 .foregroundStyle(.secondary)
 
             Picker("Content", selection: $tab) {
-                Text("Help").tag(0)
-                Text("Changelog").tag(1)
+                Text("How to Play").tag(0)
+                Text("What's New").tag(1)
             }
             .pickerStyle(.segmented)
 

@@ -26,7 +26,7 @@ struct RecordsScreen: View {
                 get: { viewModel.state.selectedType },
                 set: { viewModel.selectType($0) }
             )) {
-                Text("My Records").tag(RecordsType.mine)
+                Text("Personal").tag(RecordsType.mine)
                 Text("Global").tag(RecordsType.global)
                 Text("Today").tag(RecordsType.today)
             }
@@ -107,7 +107,7 @@ struct RecordsScreen: View {
         }
         .frame(maxWidth: 720)
         .padding(16)
-        .navigationTitle("Records")
+        .navigationTitle("Leaderboard")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button("Reload") {
@@ -154,9 +154,9 @@ struct RecordsScreen: View {
     private var emptyText: String {
         switch viewModel.state.selectedType {
         case .mine:
-            "No records yet"
+            "No records yet..."
         case .global, .today:
-            "Coming soon"
+            "Coming in a future update!"
         }
     }
 
