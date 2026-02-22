@@ -185,6 +185,7 @@ struct GameScreen: View {
                 ResultOverlayView(
                     seconds: resultSeconds,
                     level: resultLevel,
+                    dual: activeGridConfig.dual,
                     onHome: { dismiss() },
                     onNewGame: {
                         showsResultAlert = false
@@ -348,6 +349,7 @@ struct GameScreen: View {
 fileprivate struct ResultOverlayView: View {
     let seconds: String
     let level: Int
+    let dual: Bool
     let onHome: () -> Void
     let onNewGame: () -> Void
 
@@ -376,7 +378,7 @@ fileprivate struct ResultOverlayView: View {
                     // 入场动画由 StarRowView 内部 onAppear stagger 驱动
                     StarRowView(
                         count: level,
-                        dual: false,
+                        dual: dual,
                         showColorful: level == 5,
                         size: 36,
                         animated: true
