@@ -107,6 +107,7 @@ struct RecordsScreen: View {
         .task {
             await viewModel.load(initialGridConfig: initialGridConfig)
         }
+        .edgeOnlySwipeBack()
     }
 
     private var emptyText: String {

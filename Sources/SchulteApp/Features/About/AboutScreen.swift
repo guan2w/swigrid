@@ -32,6 +32,7 @@ struct AboutScreen: View {
         }
         .padding(20)
         .navigationTitle("About")
+        .edgeOnlySwipeBack()
     }
 
     private var helpMarkdown: String {

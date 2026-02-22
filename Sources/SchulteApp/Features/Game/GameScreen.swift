@@ -3,7 +3,6 @@ import SchulteDomain
 import SchulteFeatures
 
 struct GameScreen: View {
-    @Environment(\.dismiss) private var dismiss
 
     @StateObject private var viewModel: GameViewModel
 
@@ -138,17 +137,7 @@ struct GameScreen: View {
             } // End ZStack
         }
         .navigationTitle("Challenge")
-        .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button { dismiss() } label: {
-                    Image(systemName: "chevron.backward")
-                        .font(.system(size: 18, weight: .semibold))
-                        .padding(12)
-                        .contentShape(Rectangle())
-                }
-            }
-        }
+        .edgeOnlySwipeBack()
         .task {
             await configureGame()
         }
@@ -186,7 +175,6 @@ struct GameScreen: View {
                     seconds: resultSeconds,
                     level: resultLevel,
                     dual: activeGridConfig.dual,
-                    onHome: { dismiss() },
                     onNewGame: {
                         showsResultAlert = false
                         Task { await configureGame() }
@@ -347,10 +335,11 @@ struct GameScreen: View {
 // MARK: - Result Overlay
 
 fileprivate struct ResultOverlayView: View {
+    @Environment(\.dismiss) private var dismiss
+
     let seconds: String
     let level: Int
     let dual: Bool
-    let onHome: () -> Void
     let onNewGame: () -> Void
 
 
@@ -400,7 +389,7 @@ fileprivate struct ResultOverlayView: View {
                     // ── Buttons ────────────────────────────────────
                     HStack(spacing: 14) {
                         // Return Home
-                        Button(action: onHome) {
+                        Button(action: { dismiss() }) {
                             HStack(spacing: 6) {
                                 Image(systemName: "house")
                                     .font(.system(size: 15, weight: .semibold))
