@@ -180,12 +180,20 @@ struct GameScreen: View {
                 await saveResultIfNeeded()
             }
         }
-        .alert("Round Complete", isPresented: $showsResultAlert) {
-            Button("OK", role: .cancel) {
-                dismiss()
+        .overlay {
+            if showsResultAlert {
+                ResultOverlayView(
+                    seconds: resultSeconds,
+                    level: resultLevel,
+                    onHome: { dismiss() },
+                    onNewGame: {
+                        showsResultAlert = false
+                        Task { await configureGame() }
+                    }
+                )
+                .transition(.opacity.combined(with: .scale(scale: 0.96)))
+                .animation(.spring(response: 0.4, dampingFraction: 0.8), value: showsResultAlert)
             }
-        } message: {
-            Text("Time: \(resultSeconds)\nRating: \(resultLevel)/5")
         }
         .alert("Unable to Continue", isPresented: Binding(
             get: { errorMessage != nil },
@@ -334,6 +342,148 @@ struct GameScreen: View {
         String(format: "%.2f", ScoringRule.millisecondsToSeconds(milliseconds))
     }
 }
+
+// MARK: - Result Overlay
+
+fileprivate struct ResultOverlayView: View {
+    let seconds: String
+    let level: Int
+    let onHome: () -> Void
+    let onNewGame: () -> Void
+
+    @State private var starsVisible = false
+
+    private let gold = Color(red: 0.976, green: 0.73, blue: 0.10)
+    private let orange = Color(red: 0.95, green: 0.45, blue: 0.1)
+
+    var body: some View {
+        ZStack {
+            // 明亮半透明蒙层：浅色而不是纯黑
+            Color.white.opacity(0.18)
+                .ignoresSafeArea()
+                .background(.ultraThinMaterial)
+                .ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                Spacer()
+
+                VStack(spacing: 28) {
+                    // ── Title ──────────────────────────────────────
+                    Text("Round Complete")
+                        .font(.system(size: 26, weight: .bold, design: .rounded))
+                        .foregroundStyle(Color(white: 0.12))
+
+                    // ── Stars ──────────────────────────────────────
+                    HStack(spacing: 10) {
+                        ForEach(1...5, id: \.self) { star in
+                            Image(systemName: star <= level ? "star.fill" : "star")
+                                .font(.system(size: 36, weight: .semibold))
+                                .foregroundStyle(
+                                    star <= level
+                                        ? gold
+                                        : Color(white: 0.0).opacity(0.15)
+                                )
+                                .shadow(
+                                    color: star <= level ? gold.opacity(0.7) : .clear,
+                                    radius: 8, x: 0, y: 0
+                                )
+                                .scaleEffect(starsVisible && star <= level ? 1.0 : (starsVisible ? 0.85 : 0.4))
+                                .opacity(starsVisible ? 1.0 : 0)
+                                .animation(
+                                    .spring(response: 0.4, dampingFraction: 0.6)
+                                        .delay(Double(star - 1) * 0.08),
+                                    value: starsVisible
+                                )
+                        }
+                    }
+
+                    // ── Time ───────────────────────────────────────
+                    VStack(spacing: 2) {
+                        Text("Time")
+                            .font(.system(size: 13, weight: .semibold, design: .rounded))
+                            .foregroundStyle(Color(white: 0.35))
+                            .tracking(1.5)
+                            .textCase(.uppercase)
+                        Text(seconds)
+                            .font(.custom("Digital-7MonoItalic", size: 52))
+                            .foregroundStyle(gold)
+                            .shadow(color: gold.opacity(0.5), radius: 6)
+                    }
+
+                    // ── Buttons ────────────────────────────────────
+                    HStack(spacing: 14) {
+                        // Return Home
+                        Button(action: onHome) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "house")
+                                    .font(.system(size: 15, weight: .semibold))
+                                Text("Home")
+                                    .font(.system(size: 17, weight: .semibold, design: .rounded))
+                            }
+                            .foregroundStyle(Color(white: 0.2))
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 52)
+                            .background(Color.white.opacity(0.72), in: Capsule())
+                            .overlay(Capsule().stroke(Color.white, lineWidth: 1.5))
+                            .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 4)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+
+                        // New Game
+                        Button(action: onNewGame) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "arrow.clockwise")
+                                    .font(.system(size: 15, weight: .semibold))
+                                Text("New Game")
+                                    .font(.system(size: 17, weight: .semibold, design: .rounded))
+                            }
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 52)
+                            .background(
+                                Capsule()
+                                    .fill(
+                                        LinearGradient(
+                                            colors: [gold, orange],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    )
+                            )
+                            .overlay(Capsule().stroke(Color.white.opacity(0.5), lineWidth: 1.5))
+                            .shadow(color: gold.opacity(0.55), radius: 12, x: 0, y: 5)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                    .padding(.horizontal, 4)
+                }
+                .padding(.horizontal, 28)
+                .padding(.vertical, 36)
+                // 卡片：白色半透明底 + thinMaterial，明亮干净
+                .background(
+                    RoundedRectangle(cornerRadius: 28, style: .continuous)
+                        .fill(Color.white.opacity(0.78))
+                        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 28, style: .continuous)
+                        .stroke(Color.white, lineWidth: 1.5)
+                )
+                .shadow(color: gold.opacity(0.18), radius: 20, x: 0, y: 8)
+                .shadow(color: .black.opacity(0.08), radius: 40, x: 0, y: 16)
+                .padding(.horizontal, 24)
+
+                Spacer()
+            }
+        }
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                starsVisible = true
+            }
+        }
+    }
+}
+
 
 fileprivate struct TouchDownButtonStyle: ButtonStyle {
     let action: () -> Void
