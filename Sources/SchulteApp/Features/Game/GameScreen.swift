@@ -351,7 +351,6 @@ fileprivate struct ResultOverlayView: View {
     let onHome: () -> Void
     let onNewGame: () -> Void
 
-    @State private var starsVisible = false
 
     private let gold = Color(red: 0.976, green: 0.73, blue: 0.10)
     private let orange = Color(red: 0.95, green: 0.45, blue: 0.1)
@@ -374,28 +373,14 @@ fileprivate struct ResultOverlayView: View {
                         .foregroundStyle(Color(white: 0.12))
 
                     // ── Stars ──────────────────────────────────────
-                    HStack(spacing: 10) {
-                        ForEach(1...5, id: \.self) { star in
-                            Image(systemName: star <= level ? "star.fill" : "star")
-                                .font(.system(size: 36, weight: .semibold))
-                                .foregroundStyle(
-                                    star <= level
-                                        ? gold
-                                        : Color(white: 0.0).opacity(0.15)
-                                )
-                                .shadow(
-                                    color: star <= level ? gold.opacity(0.7) : .clear,
-                                    radius: 8, x: 0, y: 0
-                                )
-                                .scaleEffect(starsVisible && star <= level ? 1.0 : (starsVisible ? 0.85 : 0.4))
-                                .opacity(starsVisible ? 1.0 : 0)
-                                .animation(
-                                    .spring(response: 0.4, dampingFraction: 0.6)
-                                        .delay(Double(star - 1) * 0.08),
-                                    value: starsVisible
-                                )
-                        }
-                    }
+                    // 入场动画由 StarRowView 内部 onAppear stagger 驱动
+                    StarRowView(
+                        count: level,
+                        dual: false,
+                        showColorful: level == 5,
+                        size: 36,
+                        animated: true
+                    )
 
                     // ── Time ───────────────────────────────────────
                     VStack(spacing: 2) {
@@ -476,11 +461,7 @@ fileprivate struct ResultOverlayView: View {
                 Spacer()
             }
         }
-        .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                starsVisible = true
-            }
-        }
+
     }
 }
 
