@@ -24,6 +24,7 @@ struct GameScreen: View {
     @State private var errorMessage: String? = nil
 
     @State private var flashIndex: Int?
+    @State private var showCountdown = false
 
     @State private var audioService = AudioService()
     @State private var hapticService = HapticService()
@@ -93,16 +94,22 @@ struct GameScreen: View {
 
                 ZStack {
                     gridView(side: gridSide, screenWidth: proxy.size.width)
-                        .overlay(alignment: .center) {
-                            if viewModel.state.status == .ready {
-                                Text(viewModel.state.countdown > 0 ? "\(viewModel.state.countdown)" : "Go")
-                                    .font(.custom("CrashNumberingGothic", size: 150))
-                                    .foregroundStyle(.green.opacity(0.7))
-                                    .shadow(color: Color.black.opacity(0.13), radius: 4)
-                            }
-                        }
                 }
-                .padding(.bottom, 24)
+                .padding(.bottom, 48)
+                // 倒计时期间的蒙版：status 变 .ongoing 时立刻消失
+                .overlay {
+                    if viewModel.state.status == .ready {
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(Color(uiColor: .systemBackground).opacity(0.35))
+                            .allowsHitTesting(false)
+                    }
+                }
+                // 灯组：延迟移除，让 burst 动画播完
+                .overlay(alignment: .bottom) {
+                    if showCountdown {
+                        RacingLightsOverlayView(countdown: viewModel.state.countdown)
+                    }
+                }
 
                 Button {
                     Task { await configureGame() }
@@ -147,13 +154,24 @@ struct GameScreen: View {
         }
         .onReceive(countdownTimer) { _ in
             if player.hasName, viewModel.state.status == .ready, viewModel.state.countdown > 0 {
-                viewModel.tickCountdown()
+                // withAnimation is required to trigger the structural .burstOut transition
+                // when countdown hits 0. The individual RacingLight uses .animation(value: isLit)
+                // which overrides this context for isLit property changes.
+                withAnimation(.easeOut(duration: 0.28)) {
+                    viewModel.tickCountdown()
+                }
             }
         }
         .onReceive(elapsedTimer) { _ in
             viewModel.tickTimer()
         }
         .onChange(of: viewModel.state.status) { _, newStatus in
+            if newStatus == .ongoing {
+                // countdown 刚结束 → 延迟移除 overlay，给 burst 动画留时间
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    showCountdown = false
+                }
+            }
             guard newStatus == .finished else {
                 return
             }
@@ -241,6 +259,7 @@ struct GameScreen: View {
             }
 
             try viewModel.configure(gridConfig: activeGridConfig)
+            showCountdown = true
             if let gridNumbers = viewModel.state.gridNumbers {
                 displayedNumbers = gridNumbers.firstRound.map { Optional($0) }
                 deferredSecondRoundNumbers = gridNumbers.secondRound
@@ -330,5 +349,88 @@ fileprivate struct TouchDownButtonStyle: ButtonStyle {
                     }
                 }
             }
+    }
+}
+
+// MARK: - Racing Lights Countdown
+
+/// F1 发车红灯倒计时覆盖层。
+/// burstProgress 由 onChange 驱动，确保 withAnimation 上下文明确可靠。
+fileprivate struct RacingLightsOverlayView: View {
+    let countdown: Int
+
+    @State private var burstProgress: CGFloat = 0
+
+    private var litCount: Int {
+        switch countdown {
+        case 3: return 1
+        case 2: return 2
+        case 1: return 3
+        default: return 0
+        }
+    }
+
+    var body: some View {
+        VStack(spacing: 6) {
+            HStack(spacing: 10) {
+                ForEach(0..<3, id: \.self) { i in
+                    RacingLight(isLit: i < litCount, burstProgress: burstProgress, index: i)
+                }
+            }
+            if burstProgress > 0.4 {
+                Text("GO!")
+                    .font(.system(size: 18, weight: .semibold, design: .rounded))
+                    .foregroundStyle(Color.primary.opacity(0.7))
+                    .transition(.scale(scale: 0.5).combined(with: .opacity))
+            }
+        }
+        .onChange(of: countdown) { _, newVal in
+            if newVal == 0 {
+                withAnimation(.easeOut(duration: 0.3)) {
+                    burstProgress = 1
+                }
+            } else {
+                burstProgress = 0
+            }
+        }
+    }
+}
+
+/// 单盏灯：接收 burstProgress 并直接应用非均匀变换
+fileprivate struct RacingLight: View {
+    let isLit: Bool
+    let burstProgress: CGFloat  // 0 = 正常, 1 = 完全 burst 消失
+    let index: Int
+
+    private let redGlow = Color(red: 1.0, green: 0.1, blue: 0.1)
+
+    // 每盏灯的 burst 方向与形变比例各异，制造不规则炸裂感
+    private var bScaleX: CGFloat { [3.4, 1.4, 3.0][min(index, 2)] }
+    private var bScaleY: CGFloat { [1.3, 3.6, 1.5][min(index, 2)] }
+    private var bDX:     CGFloat { [-28, 0, 26][min(index, 2)] }
+    private var bDY:     CGFloat { [-8, -26, -10][min(index, 2)] }
+
+    var body: some View {
+        let notBursting = burstProgress == 0
+        Circle()
+            .fill(isLit && notBursting ? redGlow.opacity(0.35) : Color.clear)
+            .background(.ultraThinMaterial, in: Circle())
+            .overlay(
+                Circle().stroke(
+                    isLit && notBursting
+                        ? redGlow.opacity(0.55)
+                        : Color.white.opacity(max(0, 0.45 * (1 - burstProgress))),
+                    lineWidth: 1.5
+                )
+            )
+            .frame(width: 28, height: 28)
+            .shadow(color: isLit && notBursting ? redGlow.opacity(0.25) : .clear, radius: 6)
+            // 非均匀 burst 变换：由父级 withAnimation 驱动 burstProgress 插值
+            .scaleEffect(x: 1 + (bScaleX - 1) * burstProgress,
+                         y: 1 + (bScaleY - 1) * burstProgress)
+            .offset(x: bDX * burstProgress, y: bDY * burstProgress)
+            .opacity(Double(max(0, 1 - burstProgress)))
+            .blur(radius: 4 * burstProgress)
+            .animation(.spring(response: 0.2, dampingFraction: 0.65), value: isLit)
     }
 }
