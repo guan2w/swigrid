@@ -68,7 +68,7 @@ struct RecordsScreen: View {
             let starSize = contentFontSize * 1.44 * 1.2
             let starSpacing: CGFloat = 4
             let maxStarCount: CGFloat = 5
-            let rankColumnWidth = contentFontSize * 2.1
+            let rankColumnWidth = contentFontSize * 3.0
             let timeColumnWidth = contentFontSize * 4.0
             let timeToStarsGap = contentFontSize * 0.6
             let levelColumnWidth = (starSize * maxStarCount) + (starSpacing * (maxStarCount - 1)) + 6
@@ -79,10 +79,9 @@ struct RecordsScreen: View {
             } else {
                 List {
                     ForEach(Array(viewModel.state.records.enumerated()), id: \.offset) { offset, record in
+                        let rank = offset + 1
                         HStack(spacing: 8) {
-                            Text("#\(offset + 1)")
-                                .font(.system(size: contentFontSize))
-                                .foregroundStyle(.secondary)
+                            rankView(rank: rank, contentFontSize: contentFontSize)
                                 .frame(width: rankColumnWidth, alignment: .center)
 
                             Text(String(format: "%.2f", record.timeScoreAsSeconds))
@@ -111,6 +110,10 @@ struct RecordsScreen: View {
                         }
                         .frame(minHeight: starSize + 2)
                         .listRowInsets(EdgeInsets(top: 6, leading: 8, bottom: 6, trailing: 8))
+                        .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
+                        .alignmentGuide(.listRowSeparatorTrailing) { dimensions in
+                            dimensions.width
+                        }
                     }
                 }
                 .listStyle(.plain)
@@ -170,6 +173,29 @@ struct RecordsScreen: View {
             "No records yet..."
         case .global, .today:
             "Coming in a future update!"
+        }
+    }
+
+    @ViewBuilder
+    private func rankView(rank: Int, contentFontSize: CGFloat) -> some View {
+        switch rank {
+        case 1:
+            Image(systemName: "medal.fill")
+                .font(.system(size: contentFontSize * 1.05))
+                .foregroundStyle(Color(red: 0.953, green: 0.741, blue: 0.102))
+        case 2:
+            Image(systemName: "medal.fill")
+                .font(.system(size: contentFontSize * 1.05))
+                .foregroundStyle(Color(red: 0.651, green: 0.686, blue: 0.729))
+        case 3:
+            Image(systemName: "medal.fill")
+                .font(.system(size: contentFontSize * 1.05))
+                .foregroundStyle(Color(red: 0.804, green: 0.522, blue: 0.247))
+        default:
+            Text("\(rank)")
+                .font(.system(size: contentFontSize, weight: .semibold, design: .rounded))
+                .monospacedDigit()
+                .foregroundStyle(.secondary)
         }
     }
 
