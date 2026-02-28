@@ -5,7 +5,7 @@ struct AboutScreen: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Swigrid")
+            Text("Swift Grid")
                 .font(.system(size: 36, weight: .bold, design: .serif))
 
             Text("Train your focus and visual scanning skills with a fluid native iOS experience.")

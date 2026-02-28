@@ -62,7 +62,7 @@ struct HomeScreen: View {
 
     private var titleArea: some View {
         ZStack {
-            Text("Swigrid")
+            Text("Swift Grid")
                 // Use a modern rounded system font instead of the custom one for a cleaner look
                 .font(.system(size: 54, weight: .heavy, design: .rounded))
                 .foregroundStyle(Color.primary.opacity(0.85))

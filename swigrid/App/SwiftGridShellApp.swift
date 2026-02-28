@@ -2,7 +2,7 @@ import SwiftUI
 import SchulteAppUI
 
 @main
-struct SwigridShellApp: App {
+struct SwiftGridShellApp: App {
     #if os(iOS)
     @UIApplicationDelegateAdaptor(OrientationLockedAppDelegate.self) private var appDelegate
     #endif

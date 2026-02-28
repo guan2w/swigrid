@@ -136,7 +136,7 @@ struct GameScreen: View {
             .padding(16)
             } // End ZStack
         }
-        .navigationTitle("Swigrid")
+        .navigationTitle("Swift Grid")
         .edgeOnlySwipeBack()
         .task {
             await configureGame()
