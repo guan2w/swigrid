@@ -65,6 +65,13 @@ struct RecordsScreen: View {
                 .accessibilityIdentifier("records.grid.scale")
 
             let contentFontSize = geo.size.width / 24
+            let starSize = contentFontSize * 1.44 * 1.2
+            let starSpacing: CGFloat = 4
+            let maxStarCount: CGFloat = 5
+            let rankColumnWidth = contentFontSize * 2.1
+            let timeColumnWidth = contentFontSize * 4.0
+            let timeToStarsGap = contentFontSize * 0.6
+            let levelColumnWidth = (starSize * maxStarCount) + (starSpacing * (maxStarCount - 1)) + 6
             if viewModel.state.records.isEmpty {
                 Text(emptyText)
                     .foregroundStyle(.secondary)
@@ -76,28 +83,34 @@ struct RecordsScreen: View {
                             Text("#\(offset + 1)")
                                 .font(.system(size: contentFontSize))
                                 .foregroundStyle(.secondary)
-                                .frame(width: contentFontSize * 2.5, alignment: .center)
+                                .frame(width: rankColumnWidth, alignment: .center)
 
                             Text(String(format: "%.2f", record.timeScoreAsSeconds))
                                 .font(.custom("Digital-7MonoItalic", size: contentFontSize * 1.3))
                                 .fontWeight(.bold)
                                 .foregroundStyle(Color(red: 0.976, green: 0.659, blue: 0.145))
-                                .frame(width: contentFontSize * 4.5, alignment: .leading)
+                                .frame(width: timeColumnWidth, alignment: .trailing)
+                                .padding(.trailing, timeToStarsGap)
 
                             StarRowView(
                                 count: record.level,
                                 dual: record.gridConfig.dual,
                                 showColorful: record.isFresh(),
-                                size: contentFontSize * 1.5
+                                size: starSize,
+                                spacing: starSpacing
                             )
-                            .frame(width: contentFontSize * 11.5, alignment: .leading)
+                            .frame(width: levelColumnWidth, alignment: .leading)
+                            .clipped()
 
                             Text(record.player.name)
                                 .font(.system(size: contentFontSize))
                                 .foregroundStyle(Color(red: 0.271, green: 0.353, blue: 0.392))
                                 .lineLimit(1)
+                                .layoutPriority(1)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
+                        .frame(minHeight: starSize + 2)
+                        .listRowInsets(EdgeInsets(top: 6, leading: 8, bottom: 6, trailing: 8))
                     }
                 }
                 .listStyle(.plain)

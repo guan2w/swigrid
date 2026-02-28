@@ -9,6 +9,7 @@ struct StarRowView: View {
     let dual: Bool
     let showColorful: Bool
     let size: CGFloat
+    var spacing: CGFloat = 4
     /// 是否使用逐颗弹入动效（仅结算弹窗需要，其他场景直接全量显示）
     var animated: Bool = false
 
@@ -69,10 +70,12 @@ struct StarRowView: View {
 
     // MARK: - 星星行（由 displayCount 驱动，ForEach 变化触发 transition）
     private var starsRow: some View {
-        HStack(spacing: 4) {
+        HStack(spacing: spacing) {
             ForEach(0..<max(0, displayCount), id: \.self) { _ in
                 Image(systemName: dual ? "star.fill" : "star")
-                    .font(.system(size: size))
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: size, height: size)
                     .transition(.asymmetric(
                         insertion: .scale(scale: 0.3).combined(with: .opacity),
                         removal:   .scale(scale: 0.3).combined(with: .opacity)
