@@ -24,11 +24,12 @@ struct GameScreen: View {
 
     @State private var flashIndex: Int?
     @State private var showCountdown = false
+    @State private var countdownTask: Task<Void, Never>?
+    @State private var hideCountdownTask: Task<Void, Never>?
 
     @State private var audioService = AudioService()
     @State private var hapticService = HapticService()
 
-    private let countdownTimer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
     private let elapsedTimer = Timer.publish(every: 0.02, on: .main, in: .common).autoconnect()
 
     init(dependency: AppDependency) {
@@ -141,15 +142,9 @@ struct GameScreen: View {
         .task {
             await configureGame()
         }
-        .onReceive(countdownTimer) { _ in
-            if player.hasName, viewModel.state.status == .ready, viewModel.state.countdown > 0 {
-                // withAnimation is required to trigger the structural .burstOut transition
-                // when countdown hits 0. The individual RacingLight uses .animation(value: isLit)
-                // which overrides this context for isLit property changes.
-                withAnimation(.easeOut(duration: 0.28)) {
-                    viewModel.tickCountdown()
-                }
-            }
+        .onDisappear {
+            countdownTask?.cancel()
+            hideCountdownTask?.cancel()
         }
         .onReceive(elapsedTimer) { _ in
             viewModel.tickTimer()
@@ -157,9 +152,9 @@ struct GameScreen: View {
         .onChange(of: viewModel.state.status) { _, newStatus in
             if newStatus == .ongoing {
                 // countdown 刚结束 → 延迟移除 overlay，给 burst 动画留时间
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    showCountdown = false
-                }
+                scheduleCountdownOverlayHide()
+            } else if newStatus == .ready {
+                hideCountdownTask?.cancel()
             }
             guard newStatus == .finished else {
                 return
@@ -241,6 +236,8 @@ struct GameScreen: View {
 
     private func configureGame() async {
         do {
+            countdownTask?.cancel()
+            hideCountdownTask?.cancel()
             let loadedPlayer = try await playerRepository.loadPlayer()
             let loadedConfig = try await gameConfigRepository.loadConfig()
             player = loadedPlayer
@@ -252,11 +249,13 @@ struct GameScreen: View {
                 displayedNumbers = []
                 deferredSecondRoundNumbers = nil
                 didSaveResult = true
+                showCountdown = false
                 return
             }
 
             try viewModel.configure(gridConfig: activeGridConfig)
             showCountdown = true
+            startCountdownSequence()
             if let gridNumbers = viewModel.state.gridNumbers {
                 displayedNumbers = gridNumbers.firstRound.map { Optional($0) }
                 deferredSecondRoundNumbers = gridNumbers.secondRound
@@ -269,6 +268,59 @@ struct GameScreen: View {
             showsResultAlert = false
         } catch {
             errorMessage = "Failed to load game setup: \(error.localizedDescription)"
+        }
+    }
+
+    private func scheduleCountdownOverlayHide() {
+        hideCountdownTask?.cancel()
+        hideCountdownTask = Task {
+            do {
+                try await Task.sleep(nanoseconds: 500_000_000)
+            } catch {
+                return
+            }
+
+            guard !Task.isCancelled else {
+                return
+            }
+
+            await MainActor.run {
+                guard viewModel.state.status != .ready else {
+                    return
+                }
+
+                showCountdown = false
+            }
+        }
+    }
+
+    private func startCountdownSequence() {
+        countdownTask?.cancel()
+        countdownTask = Task {
+            for _ in 0..<3 {
+                do {
+                    try await Task.sleep(nanoseconds: 1_000_000_000)
+                } catch {
+                    return
+                }
+
+                guard !Task.isCancelled else {
+                    return
+                }
+
+                await MainActor.run {
+                    guard player.hasName, viewModel.state.status == .ready, viewModel.state.countdown > 0 else {
+                        return
+                    }
+
+                    // withAnimation is required to trigger the structural .burstOut transition
+                    // when countdown hits 0. The individual RacingLight uses .animation(value: isLit)
+                    // which overrides this context for isLit property changes.
+                    withAnimation(.easeOut(duration: 0.28)) {
+                        viewModel.tickCountdown()
+                    }
+                }
+            }
         }
     }
 
