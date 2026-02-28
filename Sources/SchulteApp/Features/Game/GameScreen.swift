@@ -297,11 +297,18 @@ struct GameScreen: View {
     private func startCountdownSequence() {
         countdownTask?.cancel()
         countdownTask = Task {
-            for _ in 0..<3 {
-                do {
-                    try await Task.sleep(nanoseconds: 1_000_000_000)
-                } catch {
-                    return
+            let intervalNanoseconds: UInt64 = 1_000_000_000
+            let startUptime = DispatchTime.now().uptimeNanoseconds
+
+            for step in 1...3 {
+                let deadline = startUptime + UInt64(step) * intervalNanoseconds
+                let now = DispatchTime.now().uptimeNanoseconds
+                if deadline > now {
+                    do {
+                        try await Task.sleep(nanoseconds: deadline - now)
+                    } catch {
+                        return
+                    }
                 }
 
                 guard !Task.isCancelled else {
