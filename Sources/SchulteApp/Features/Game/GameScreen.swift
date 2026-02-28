@@ -25,7 +25,7 @@ struct GameScreen: View {
     @State private var flashIndex: Int?
     @State private var showCountdown = false
     @State private var countdownTask: Task<Void, Never>?
-    @State private var hideCountdownTask: Task<Void, Never>?
+    @State private var countdownRound = 0
 
     @State private var audioService = AudioService()
     @State private var hapticService = HapticService()
@@ -144,7 +144,6 @@ struct GameScreen: View {
         }
         .onDisappear {
             countdownTask?.cancel()
-            hideCountdownTask?.cancel()
         }
         .onReceive(elapsedTimer) { _ in
             viewModel.tickTimer()
@@ -152,9 +151,16 @@ struct GameScreen: View {
         .onChange(of: viewModel.state.status) { _, newStatus in
             if newStatus == .ongoing {
                 // countdown 刚结束 → 延迟移除 overlay，给 burst 动画留时间
-                scheduleCountdownOverlayHide()
-            } else if newStatus == .ready {
-                hideCountdownTask?.cancel()
+                let currentRound = countdownRound
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    guard countdownRound == currentRound else {
+                        return
+                    }
+                    guard viewModel.state.status != .ready else {
+                        return
+                    }
+                    showCountdown = false
+                }
             }
             guard newStatus == .finished else {
                 return
@@ -237,7 +243,7 @@ struct GameScreen: View {
     private func configureGame() async {
         do {
             countdownTask?.cancel()
-            hideCountdownTask?.cancel()
+            countdownRound += 1
             let loadedPlayer = try await playerRepository.loadPlayer()
             let loadedConfig = try await gameConfigRepository.loadConfig()
             player = loadedPlayer
@@ -268,29 +274,6 @@ struct GameScreen: View {
             showsResultAlert = false
         } catch {
             errorMessage = "Failed to load game setup: \(error.localizedDescription)"
-        }
-    }
-
-    private func scheduleCountdownOverlayHide() {
-        hideCountdownTask?.cancel()
-        hideCountdownTask = Task {
-            do {
-                try await Task.sleep(nanoseconds: 500_000_000)
-            } catch {
-                return
-            }
-
-            guard !Task.isCancelled else {
-                return
-            }
-
-            await MainActor.run {
-                guard viewModel.state.status != .ready else {
-                    return
-                }
-
-                showCountdown = false
-            }
         }
     }
 
